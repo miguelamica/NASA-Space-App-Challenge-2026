@@ -243,7 +243,7 @@ button svg{width:18px;height:18px}
 .msg.karaoke .w.past{color:#f2f2f2}
 .msg.karaoke .w.now{color:#000;background:#fff;box-shadow:0 0 0 2px #fff}
 @keyframes blink{50%{opacity:0}}
-.storyui{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.storyui{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end}
 .storyui .grp{display:flex;gap:8px;flex-wrap:wrap}
 .vbadge{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:#9a9a9a}
 .vbadge svg{width:16px;height:16px;color:var(--blue-l)}
@@ -579,14 +579,14 @@ const IC={
 /* =============== datos verificados (NASA Science + NSSDCA) =============== */
 const R=[
 {id:"viking1",name:"Viking 1",ab:"V1",lat:22.27,lon:-47.95,side:-1,start:"1976-07-20",end:"1982-11-13",plan:90,planDays:90,game:"foto",model:"viking",
- es:{kind:"Lander",place:"Chryse Planitia",to:"a Chryse Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",endL:"Último contacto",xT:"Fotos",xV:"Unas 4.500 entre los dos landers Viking",silent:"En silencio desde 1982",voiceL:"grave y pausada",
+ es:{kind:"Lander",place:"Chryse Planitia",to:"a Chryse Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",endL:"Último contacto",xT:"Fotos",xV:"Unas 4.500 entre los dos landers Viking",silent:"En silencio desde 1982",
   gT:"Recibí la primera foto",gH:"Mis cámaras no sacaban la foto de golpe: la armaban en franjas verticales que viajaban hasta la Tierra.",
   hs:{cam:"Dos cámaras que escaneaban el paisaje franja por franja.",arm:"Brazo con pala para juntar tierra y llevarla a mi laboratorio, que buscaba señales de vida.",rtg:"Generadores nucleares (RTG): mi energía no dependía del Sol. Por eso duré tantos años.",dish:"Antena para comunicarme con la Tierra.",met:"Estación del clima: medía el tiempo marciano."},
   ch:{a:"Me llamo Viking 1. El 20 de julio de 1976 me separé de mi nave orbital y bajé a una llanura que llamaron Chryse Planitia, las Llanuras de Oro. Fui la primera nave de Estados Unidos en posarse sana y salva en Marte.",
   b:"Tenía dos cámaras que escaneaban el paisaje franja por franja, un brazo con pala para juntar tierra, un sismómetro, una estación del clima y un pequeño laboratorio químico. Mi energía no venía del Sol sino de generadores nucleares, y por eso pude trabajar tantos años.",
   c:"Minutos después de aterrizar mandé la primera foto tomada en la superficie de Marte. Después hice tres experimentos para buscar vida en el suelo. Los resultados fueron confusos y la mayoría de los científicos cree que no había vida ahí, pero le enseñé a la humanidad cómo buscarla.",
   d:"Durante años mandé reportes del clima marciano. En noviembre de 1982, una orden equivocada enviada desde la Tierra cortó las comunicaciones. Los intentos por recuperarlas no funcionaron. Sigo acá, mirando las Llanuras de Oro."}},
- en:{kind:"Lander",place:"Chryse Planitia",to:"a Chryse Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",endL:"Last contact",xT:"Photos",xV:"About 4,500 between both Viking landers",silent:"Silent since 1982",voiceL:"deep and slow",
+ en:{kind:"Lander",place:"Chryse Planitia",to:"a Chryse Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",endL:"Last contact",xT:"Photos",xV:"About 4,500 between both Viking landers",silent:"Silent since 1982",
   gT:"Receive the first photo",gH:"My cameras didn't snap a picture all at once: they built it in vertical strips that traveled to Earth.",
   hs:{cam:"Two cameras that scanned the landscape strip by strip.",arm:"A scoop arm to collect soil and bring it to my lab, which looked for signs of life.",rtg:"Nuclear generators (RTGs): my power didn't depend on the Sun. That's why I lasted so many years.",dish:"Antenna to talk to Earth.",met:"Weather station: it measured Martian weather."},
   ch:{a:"My name is Viking 1. On July 20, 1976, I separated from my orbiter and came down on a plain called Chryse Planitia, the Plains of Gold. I was the first United States spacecraft to land safely on Mars.",
@@ -594,14 +594,14 @@ const R=[
   c:"Minutes after landing I sent the first photo ever taken on the surface of Mars. Then I ran three experiments to look for life in the soil. The results were confusing, and most scientists think there was no life there, but I taught humanity how to search for it.",
   d:"For years I sent Martian weather reports. In November 1982, a mistaken command sent from Earth cut off communications. Attempts to restore them failed. I'm still here, watching over the Plains of Gold."}}},
 {id:"viking2",name:"Viking 2",ab:"V2",lat:47.64,lon:134.29,side:1,start:"1976-09-03",end:"1980-04-11",plan:90,planDays:90,game:"escarcha",model:"viking",rocky:true,
- es:{kind:"Lander",place:"Utopia Planitia",to:"a Utopia Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",endL:"Últimos datos",xT:"En la superficie",xV:"1.281 soles (días marcianos)",silent:"En silencio desde 1980",voiceL:"grave, de gemelo",
+ es:{kind:"Lander",place:"Utopia Planitia",to:"a Utopia Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",endL:"Últimos datos",xT:"En la superficie",xV:"1.281 soles (días marcianos)",silent:"En silencio desde 1980",
   gT:"Llegó el invierno",gH:"Cambiá de estación y mirá qué aparece sobre las piedras.",
   hs:{cam:"Mis dos cámaras: con ellas fotografié la escarcha.",arm:"Brazo con pala, igual al de mi gemelo.",rtg:"Generadores nucleares (RTG) para tener energía día y noche.",dish:"Antena para hablar con la Tierra.",met:"Estación del clima: viví inviernos muy fríos."},
   ch:{a:"Soy Viking 2, el gemelo. Aterricé el 3 de septiembre de 1976 en Utopia Planitia, mucho más al norte que mi hermano, en un campo lleno de piedras.",
   b:"Tenía los mismos instrumentos que Viking 1: cámaras, brazo con pala, laboratorio para buscar vida y estación del clima. Con dos gemelos en lugares distintos, los científicos podían comparar dos rincones de Marte.",
   c:"Como estaba tan al norte, viví inviernos muy fríos. En uno de ellos fotografié una capa finísima de escarcha blanca sobre el suelo rojo. ¡Hielo en Marte, visto desde el propio suelo!",
   d:"Mis baterías se fueron gastando. El 11 de abril de 1980 llegaron a la Tierra mis últimos datos. Mi hermano siguió hablando dos años más que yo."}},
- en:{kind:"Lander",place:"Utopia Planitia",to:"a Utopia Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",endL:"Last data",xT:"On the surface",xV:"1,281 sols (Martian days)",silent:"Silent since 1980",voiceL:"deep, like a twin",
+ en:{kind:"Lander",place:"Utopia Planitia",to:"a Utopia Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",endL:"Last data",xT:"On the surface",xV:"1,281 sols (Martian days)",silent:"Silent since 1980",
   gT:"Winter is coming",gH:"Change the season and see what shows up on the rocks.",
   hs:{cam:"My two cameras: I photographed the frost with them.",arm:"Scoop arm, just like my twin's.",rtg:"Nuclear generators (RTGs) for power day and night.",dish:"Antenna to talk to Earth.",met:"Weather station: I lived through very cold winters."},
   ch:{a:"I'm Viking 2, the twin. I landed on September 3, 1976, in Utopia Planitia, much farther north than my sibling, in a field full of rocks.",
@@ -609,14 +609,14 @@ const R=[
   c:"Because I was so far north, I lived through very cold winters. In one of them I photographed a super-thin layer of white frost on the red ground. Ice on Mars, seen from the ground itself!",
   d:"My batteries slowly wore out. My last data reached Earth on April 11, 1980. My sibling kept talking for two more years."}}},
 {id:"sojourner",name:"Sojourner",ab:"SJ",lat:19.13,lon:-33.22,side:1,start:"1997-07-04",end:"1997-09-27",plan:7,real:83,planDays:7,game:"manejar",model:"sojourner",
- es:{kind:"Rover",place:"Ares Vallis",to:"a Ares Vallis",planL:"7 días",realL:"83 días",energy:"Solar",endL:"Último contacto",xT:"Recorrido",xV:"Unos 100 m",silent:"En silencio desde 1997",voiceL:"chiquita y aguda",
+ es:{kind:"Rover",place:"Ares Vallis",to:"a Ares Vallis",planL:"7 días",realL:"83 días",energy:"Solar",endL:"Último contacto",xT:"Recorrido",xV:"Unos 100 m",silent:"En silencio desde 1997",
   gT:"Manejá a Sojourner",gH:"Llevalo hasta las rocas Yogi y Barnacle Bill para analizarlas. Usá los botones o las flechas del teclado.",
   hs:{solar:"Panel solar: mi fuente de energía.",apxs:"Espectrómetro APXS: dice de qué están hechas las rocas.",wheels:"Seis ruedas para andar sobre piedras.",lander:"El lander Mars Pathfinder, rebautizado Estación Memorial Carl Sagan. Sin él no podía hablar con la Tierra.",bill:"Barnacle Bill: una de las rocas que analicé.",yogi:"Yogi: otra roca con nombre de dibujo animado."},
   ch:{a:"Soy Sojourner, el primer rover que rodó en otro planeta. Viajé plegado dentro del lander Mars Pathfinder, que el 4 de julio de 1997 cayó envuelto en bolsas de aire y rebotó sobre Ares Vallis, una antigua llanura de inundaciones.",
   b:"Era del tamaño de un horno microondas y pesaba unos 10,5 kg. Tenía seis ruedas, un panel solar y un espectrómetro para saber de qué estaban hechas las rocas. Las órdenes tardaban minutos en llegar desde la Tierra, así que mis conductores planeaban cada movimiento con mucho cuidado.",
   c:"Analicé rocas a las que el equipo les puso nombres de dibujos animados, como Yogi y Barnacle Bill. Las pistas mostraron que esa llanura se formó con inundaciones: Marte había tenido mucha más agua.",
   d:"Me prometieron 7 días de trabajo y duré 83. El 27 de septiembre de 1997 mi lander dejó de comunicarse, probablemente por una batería gastada, y sin él yo no podía hablar con la Tierra. A mi lander lo rebautizaron Estación Memorial Carl Sagan."}},
- en:{kind:"Rover",place:"Ares Vallis",to:"a Ares Vallis",planL:"7 days",realL:"83 days",energy:"Solar",endL:"Last contact",xT:"Distance driven",xV:"About 100 m",silent:"Silent since 1997",voiceL:"small and high",
+ en:{kind:"Rover",place:"Ares Vallis",to:"a Ares Vallis",planL:"7 days",realL:"83 days",energy:"Solar",endL:"Last contact",xT:"Distance driven",xV:"About 100 m",silent:"Silent since 1997",
   gT:"Drive Sojourner",gH:"Take it to the rocks Yogi and Barnacle Bill to analyze them. Use the buttons or your keyboard arrows.",
   hs:{solar:"Solar panel: my power source.",apxs:"APXS spectrometer: it tells what rocks are made of.",wheels:"Six wheels to roll over rocks.",lander:"The Mars Pathfinder lander, renamed the Carl Sagan Memorial Station. Without it I couldn't talk to Earth.",bill:"Barnacle Bill: one of the rocks I analyzed.",yogi:"Yogi: another rock named after a cartoon character."},
   ch:{a:"I'm Sojourner, the first rover to roll across another planet. I traveled folded up inside the Mars Pathfinder lander, which on July 4, 1997, fell wrapped in airbags and bounced onto Ares Vallis, an ancient flood plain.",
@@ -624,14 +624,14 @@ const R=[
   c:"I analyzed rocks the team named after cartoon characters, like Yogi and Barnacle Bill. The clues showed that the plain was shaped by floods: Mars once had much more water.",
   d:"They promised me 7 days of work and I lasted 83. On September 27, 1997, my lander stopped communicating, probably because of a worn-out battery, and without it I couldn't talk to Earth. My lander was renamed the Carl Sagan Memorial Station."}}},
 {id:"spirit",name:"Spirit",ab:"SP",lat:-14.57,lon:175.47,side:-1,start:"2004-01-03",end:"2010-03-22",plan:92,planDays:92,game:"rueda",model:"mer",broken:true,
- es:{kind:"Rover",place:"Cráter Gusev",to:"al cráter Gusev",planL:"90 soles",energy:"Solar",endL:"Última comunicación",xT:"Recorrido",xV:"7,7 km",silent:"En silencio desde 2010",voiceL:"valiente",
+ es:{kind:"Rover",place:"Cráter Gusev",to:"al cráter Gusev",planL:"90 soles",energy:"Solar",endL:"Última comunicación",xT:"Recorrido",xV:"7,7 km",silent:"En silencio desde 2010",
   gT:"Arrastrá la rueda rota",gH:"Pasá el dedo o el mouse por el suelo, como hacía mi rueda trabada.",
   hs:{broken:"Mi rueda delantera derecha. Se trabó en 2006 y desde entonces manejé marcha atrás, arrastrándola.",silica:"Sílice: el suelo blanquísimo que destapó mi rueda rota en 2007. Se forma con aguas termales o vapor volcánico.",mast:"Mástil con cámaras.",arm:"Brazo robótico con microscopio y herramienta para raspar rocas.",solar:"Paneles solares: mi única fuente de energía.",dish:"Antena para hablar con la Tierra."},
   ch:{a:"Soy Spirit. El 3 de enero de 2004 llegué rebotando en bolsas de aire al cráter Gusev, un cráter gigante que podría haber sido un lago.",
   b:"Seis ruedas, paneles solares, cámaras, un brazo robótico con microscopio y una herramienta para raspar rocas. Me diseñaron para trabajar 90 soles. Un sol es un día marciano: dura 24 horas y 39 minutos.",
   c:"En 2006 se me rompió la rueda delantera derecha y empecé a manejar marcha atrás, arrastrándola. En 2007 esa rueda trabada raspó el suelo y dejó al descubierto una tierra blanquísima: era sílice. En la Tierra se forma cerca de aguas termales o vapor volcánico. ¡Una avería me llevó a uno de mis mejores descubrimientos!",
   d:"En 2009 me quedé atascado en arena blanda. Seguí estudiando como estación fija, pero no pude inclinar mis paneles hacia el Sol para pasar el invierno. Mi última comunicación fue en marzo de 2010. Recorrí 7,7 km."}},
- en:{kind:"Rover",place:"Gusev Crater",to:"at Gusev Crater",planL:"90 sols",energy:"Solar",endL:"Last communication",xT:"Distance driven",xV:"7.7 km",silent:"Silent since 2010",voiceL:"brave",
+ en:{kind:"Rover",place:"Gusev Crater",to:"at Gusev Crater",planL:"90 sols",energy:"Solar",endL:"Last communication",xT:"Distance driven",xV:"7.7 km",silent:"Silent since 2010",
   gT:"Drag the broken wheel",gH:"Run your finger or mouse across the ground, just like my stuck wheel did.",
   hs:{broken:"My front right wheel. It got stuck in 2006, and from then on I drove backwards, dragging it.",silica:"Silica: the bright white soil my broken wheel uncovered in 2007. It forms with hot springs or volcanic steam.",mast:"Camera mast.",arm:"Robotic arm with a microscope and a rock-grinding tool.",solar:"Solar panels: my only source of power.",dish:"Antenna to talk to Earth."},
   ch:{a:"I'm Spirit. On January 3, 2004, I arrived bouncing on airbags into Gusev Crater, a giant crater that may once have been a lake.",
@@ -639,14 +639,14 @@ const R=[
   c:"In 2006 my front right wheel broke, so I started driving backwards, dragging it. In 2007 that stuck wheel scraped the ground and uncovered bright white soil: it was silica. On Earth, it forms near hot springs or volcanic steam. A breakdown led me to one of my best discoveries!",
   d:"In 2009 I got stuck in soft sand. I kept doing science as a stationary station, but I couldn't tilt my panels toward the Sun to survive the winter. My last communication was in March 2010. I drove 7.7 km."}}},
 {id:"opportunity",name:"Opportunity",ab:"OP",lat:-1.95,lon:-5.53,side:1,start:"2004-01-24",end:"2018-06-10",plan:92,planDays:92,game:"odometro",model:"mer",berries:true,
- es:{kind:"Rover",place:"Meridiani Planum",to:"a Meridiani Planum",planL:"90 soles",energy:"Solar",endL:"Último contacto",xT:"Recorrido",xV:"45,16 km",silent:"En silencio desde 2018",voiceL:"alegre",
+ es:{kind:"Rover",place:"Meridiani Planum",to:"a Meridiani Planum",planL:"90 soles",energy:"Solar",endL:"Último contacto",xT:"Recorrido",xV:"45,16 km",silent:"En silencio desde 2018",
   gT:"Mi odómetro",gH:"Mirá cuánto recorrí comparado con una maratón.",
   hs:{berries:"Arándanos: bolitas de hematita que se forman con agua (acá, agrandadas).",mast:"Mástil con cámaras.",arm:"Brazo con microscopio y herramienta para raspar rocas.",solar:"Paneles solares. A veces el viento les limpiaba el polvo y me regalaba años extra.",wheels:"Seis ruedas: con ellas recorrí 45,16 km.",dish:"Antena para hablar con la Tierra."},
   ch:{a:"Soy Opportunity, gemelo de Spirit. Aterricé el 24 de enero de 2004 en Meridiani Planum y, después de rebotar en mis bolsas de aire, terminé justo adentro de un cráter chiquito. ¡Como embocar un hoyo en uno!",
   b:"Mismo cuerpo que mi gemelo: seis ruedas, paneles solares, brazo con microscopio y herramienta para raspar rocas. A veces el viento me limpiaba el polvo de los paneles, y eso me regaló años extra de vida.",
   c:"Encontré bolitas de hematita que los científicos apodaron arándanos, y rocas en capas que se forman con agua. Con Spirit confirmamos que hace mucho tiempo hubo agua en la superficie de Marte durante largos períodos.",
   d:"Me esperaban 90 soles y trabajé casi 15 años, recorriendo 45,16 km: más que una maratón. En 2018 una tormenta de polvo cubrió todo el planeta y tapó el Sol. Mi último contacto fue el 10 de junio de 2018. Mi récord de distancia duró hasta octubre de 2026."}},
- en:{kind:"Rover",place:"Meridiani Planum",to:"a Meridiani Planum",planL:"90 sols",energy:"Solar",endL:"Last contact",xT:"Distance driven",xV:"45.16 km",silent:"Silent since 2018",voiceL:"cheerful",
+ en:{kind:"Rover",place:"Meridiani Planum",to:"a Meridiani Planum",planL:"90 sols",energy:"Solar",endL:"Last contact",xT:"Distance driven",xV:"45.16 km",silent:"Silent since 2018",
   gT:"My odometer",gH:"See how far I drove compared with a marathon.",
   hs:{berries:"Blueberries: little balls of hematite that form in water (enlarged here).",mast:"Camera mast.",arm:"Arm with a microscope and a rock-grinding tool.",solar:"Solar panels. Sometimes the wind cleaned off the dust and gave me extra years.",wheels:"Six wheels: I drove 45.16 km on them.",dish:"Antenna to talk to Earth."},
   ch:{a:"I'm Opportunity, Spirit's twin. I landed on January 24, 2004, in Meridiani Planum and, after bouncing on my airbags, rolled right into a tiny crater. Like a hole in one!",
@@ -654,14 +654,14 @@ const R=[
   c:"I found little balls of hematite that scientists nicknamed blueberries, and layered rocks that form in water. Together with Spirit, we confirmed that long ago water stayed on the surface of Mars for long periods.",
   d:"They expected 90 sols and I worked for almost 15 years, driving 45.16 km: more than a marathon. In 2018 a dust storm covered the whole planet and blocked out the Sun. My last contact was on June 10, 2018. My distance record lasted until October 2026."}}},
 {id:"phoenix",name:"Phoenix",ab:"PX",lat:68.22,lon:-125.75,side:1,start:"2008-05-25",end:"2008-11-02",plan:90,planDays:90,game:"hielo",model:"phoenix",
- es:{kind:"Lander",place:"Ártico marciano",to:"al Ártico marciano",planL:"90 días",energy:"Solar",endL:"Última señal",xT:"Lanzamiento",xV:"4 de agosto de 2007",silent:"En silencio desde 2008",voiceL:"serena",
+ es:{kind:"Lander",place:"Ártico marciano",to:"al Ártico marciano",planL:"90 días",energy:"Solar",endL:"Última señal",xT:"Lanzamiento",xV:"4 de agosto de 2007",silent:"En silencio desde 2008",
   gT:"Cavá la zanja",gH:"Raspá el suelo y después esperá unos soles.",
   hs:{arm:"Brazo con pala para cavar zanjas.",ice:"La zanja: acá aparecieron los trocitos blancos de hielo.",ovens:"Hornitos para calentar muestras de suelo.",met:"Estación del clima.",solar:"Paneles solares redondos. Con el invierno llegó menos sol."},
   ch:{a:"Soy Phoenix. Mi nombre viene del ave que renace de sus cenizas: me armaron con un lander guardado de una misión cancelada. El 25 de mayo de 2008 aterricé en las llanuras árticas de Marte, más al norte que ninguna nave antes.",
   b:"No tenía ruedas: era un laboratorio fijo con un brazo-pala, hornitos para calentar muestras y una estación del clima. Fui a buscar el hielo que un satélite había detectado escondido bajo el suelo.",
   c:"Con mi brazo cavé zanjas y aparecieron trocitos blancos y brillantes. A los pocos días habían desaparecido: pasaron directo al aire. ¡Era hielo de agua! También encontré en el suelo unas sales llamadas percloratos.",
   d:"Mi misión planeada era de 90 días en el Ártico, y la extendieron. Todos sabíamos que el invierno iba a llegar: con menos sol me fui quedando sin energía. Mi última señal llegó el 2 de noviembre de 2008. Fui el primero en mandar datos desde una región polar de Marte."}},
- en:{kind:"Lander",place:"Martian Arctic",to:"in the Martian Arctic",planL:"90 days",energy:"Solar",endL:"Last signal",xT:"Launch",xV:"August 4, 2007",silent:"Silent since 2008",voiceL:"calm",
+ en:{kind:"Lander",place:"Martian Arctic",to:"in the Martian Arctic",planL:"90 days",energy:"Solar",endL:"Last signal",xT:"Launch",xV:"August 4, 2007",silent:"Silent since 2008",
   gT:"Dig the trench",gH:"Scrape the ground, then wait a few sols.",
   hs:{arm:"Scoop arm for digging trenches.",ice:"The trench: this is where the white bits of ice appeared.",ovens:"Tiny ovens to heat soil samples.",met:"Weather station.",solar:"Round solar panels. Winter brought less sunlight."},
   ch:{a:"I'm Phoenix. My name comes from the bird that rises from its ashes: I was built from a lander kept in storage after a canceled mission. On May 25, 2008, I landed on the Arctic plains of Mars, farther north than any spacecraft before.",
@@ -669,14 +669,14 @@ const R=[
   c:"I dug trenches with my arm and bright white bits appeared. A few days later they were gone: they turned straight into gas. It was water ice! I also found salts called perchlorates in the soil.",
   d:"My planned mission was 90 days in the Arctic, and it was extended. Everyone knew winter was coming: with less sunlight, I slowly ran out of power. My last signal arrived on November 2, 2008. I was the first to send data from a polar region of Mars."}}},
 {id:"insight",name:"InSight",ab:"IN",lat:4.5,lon:135.9,side:-1,start:"2018-11-26",end:"2022-12-15",plan:687,planDays:687,game:"sismo",model:"insight",
- es:{kind:"Lander",place:"Elysium Planitia",to:"a Elysium Planitia",planL:"1 año marciano",energy:"Solar",endL:"Fin de la misión",xT:"Brazo robótico",xV:"Más de 1,8 m",silent:"En silencio desde 2022",voiceL:"tranquila, de quien escucha",
+ es:{kind:"Lander",place:"Elysium Planitia",to:"a Elysium Planitia",planL:"1 año marciano",energy:"Solar",endL:"Fin de la misión",xT:"Brazo robótico",xV:"Más de 1,8 m",silent:"En silencio desde 2022",
   gT:"Escuchá un marsquake",gH:"Recreación del sismógrafo. El sonido real lo publicó la NASA (enlace abajo).",
   hs:{seis:"Sismómetro SEIS bajo su cúpula: escuchaba los marsquakes.",hp3:"Sonda para medir el calor que sale de adentro de Marte.",arm:"Brazo robótico de más de 1,8 m: con él apoyé mis instrumentos en el suelo.",solar:"Paneles solares. El polvo los fue cubriendo."},
   ch:{a:"Soy InSight. Aterricé el 26 de noviembre de 2018 en Elysium Planitia, una llanura cerca del ecuador. La eligieron por segura: yo no venía a mirar el paisaje, venía a escuchar el interior del planeta.",
   b:"Mi diseño se basó en el de Phoenix. Con mi brazo robótico, de más de 1,8 m, levanté un sismómetro y lo apoyé en el suelo bajo una cúpula. También tenía una sonda para medir el calor que sale de adentro de Marte.",
   c:"Fui el primer explorador en estudiar a fondo el interior de Marte: corteza, manto y núcleo. Escuché cientos de marsquakes, los terremotos marcianos, y hasta golpes de meteoritos. Hasta sentí el viento haciendo vibrar mi cuerpo.",
   d:"El polvo se fue acumulando sobre mis paneles solares y cada día tenía menos energía. Mi misión terminó el 15 de diciembre de 2022. Desde la órbita me siguen fotografiando para estudiar cómo se mueve el polvo."}},
- en:{kind:"Lander",place:"Elysium Planitia",to:"a Elysium Planitia",planL:"1 Mars year",energy:"Solar",endL:"End of mission",xT:"Robotic arm",xV:"Over 1.8 m",silent:"Silent since 2022",voiceL:"calm, a listener's voice",
+ en:{kind:"Lander",place:"Elysium Planitia",to:"a Elysium Planitia",planL:"1 Mars year",energy:"Solar",endL:"End of mission",xT:"Robotic arm",xV:"Over 1.8 m",silent:"Silent since 2022",
   gT:"Listen to a marsquake",gH:"A re-creation of the seismograph. NASA published the real sound (link below).",
   hs:{seis:"SEIS seismometer under its dome: it listened to marsquakes.",hp3:"Probe to measure the heat coming from inside Mars.",arm:"Robotic arm over 1.8 m long: I used it to set my instruments on the ground.",solar:"Solar panels. Dust slowly covered them."},
   ch:{a:"I'm InSight. I landed on November 26, 2018, in Elysium Planitia, a plain near the equator. It was chosen because it was safe: I didn't come to look at the scenery, I came to listen to the inside of the planet.",
@@ -684,14 +684,14 @@ const R=[
   c:"I was the first explorer to study the inside of Mars in depth: crust, mantle and core. I heard hundreds of marsquakes, and even meteorite impacts. I even felt the wind shaking my body.",
   d:"Dust kept piling up on my solar panels, and every day I had less power. My mission ended on December 15, 2022. Orbiters still photograph me to study how dust moves."}}},
 {id:"ingenuity",name:"Ingenuity",ab:"IG",lat:18.44,lon:77.45,side:1,start:"2021-04-19",end:"2024-01-18",arrive:"2021-02-18",plan:5,real:72,planDays:30,game:"vuelo",model:"ingenuity",
- es:{kind:"Helicóptero",place:"Cráter Jezero",to:"al cráter Jezero",placeNote:"sitio de aterrizaje de Perseverance",planL:"5 vuelos",realL:"72 vuelos",energy:"Solar + batería",endL:"Último vuelo",startL:"Primer vuelo",xT:"En el aire",xV:"128,8 minutos y 17 km, hasta 24 m de altura",silent:"En silencio desde 2024",voiceL:"rapidísima y aguda",
+ es:{kind:"Helicóptero",place:"Cráter Jezero",to:"al cráter Jezero",placeNote:"sitio de aterrizaje de Perseverance",planL:"5 vuelos",realL:"72 vuelos",energy:"Solar + batería",endL:"Último vuelo",startL:"Primer vuelo",xT:"En el aire",xV:"128,8 minutos y 17 km, hasta 24 m de altura",silent:"En silencio desde 2024",
   gT:"¡A volar!",gH:"Hacé despegar a Ingenuity. ¿Llegás a los 72 vuelos?",
   hs:{rotor:"Dos hélices de 1,2 m de punta a punta que giran en sentidos opuestos, muy rápido, porque el aire de Marte es finísimo.",solar:"Panel solar que carga mi batería.",body:"Mi cuerpo: batería, computadora y cámaras.",wright:"Acá, debajo del panel, llevo un pedacito de tela del avión de los hermanos Wright."},
   ch:{a:"Soy Ingenuity, un helicóptero de 1,8 kg. Viajé a Marte enganchado debajo del rover Perseverance, que aterrizó en el cráter Jezero en febrero de 2021. Mi primera prueba fue sobrevivir solo a una noche helada marciana.",
   b:"Tengo dos hélices de 1,2 m que giran en sentidos opuestos, muy rápido, porque el aire de Marte es finísimo. Panel solar, batería y cámaras. Llevo un pedacito de tela del avión de los hermanos Wright, el primero que voló en la Tierra.",
   c:"El 19 de abril de 2021 hice el primer vuelo motorizado y controlado en otro planeta. Me pedían 5 vuelos de prueba en 30 días e hice 72 en casi tres años: 128,8 minutos en el aire, 17 km recorridos y hasta 24 m de altura. Fui el explorador aéreo de Perseverance.",
   d:"En mi vuelo 72, el 18 de enero de 2024, se dañaron mis hélices y ya no pude volar más. Mi misión terminó el 25 de enero de 2024. Me quedé quieto en Jezero, pero ahora sabemos que se puede volar en Marte."}},
- en:{kind:"Helicopter",place:"Jezero Crater",to:"at Jezero Crater",placeNote:"Perseverance landing site",planL:"5 flights",realL:"72 flights",energy:"Solar + battery",endL:"Last flight",startL:"First flight",xT:"In the air",xV:"128.8 minutes and 17 km, up to 24 m high",silent:"Silent since 2024",voiceL:"super fast and high",
+ en:{kind:"Helicopter",place:"Jezero Crater",to:"at Jezero Crater",placeNote:"Perseverance landing site",planL:"5 flights",realL:"72 flights",energy:"Solar + battery",endL:"Last flight",startL:"First flight",xT:"In the air",xV:"128.8 minutes and 17 km, up to 24 m high",silent:"Silent since 2024",
   gT:"Take off!",gH:"Launch Ingenuity. Can you reach 72 flights?",
   hs:{rotor:"Two rotors, 1.2 m tip to tip, spinning in opposite directions very fast, because Mars's air is extremely thin.",solar:"Solar panel that charges my battery.",body:"My body: battery, computer and cameras.",wright:"Right here, under the panel, I carry a tiny piece of fabric from the Wright brothers' airplane."},
   ch:{a:"I'm Ingenuity, a 1.8 kg helicopter. I traveled to Mars tucked under the belly of the Perseverance rover, which landed in Jezero Crater in February 2021. My first test was surviving a freezing Martian night on my own.",
@@ -1125,7 +1125,7 @@ function render(r){
    <div class="mult"><b id="mult">×1</b><span>${L("veces lo planeado","times the plan")}</span></div></div>
   <div class="steps" role="tablist" aria-label="${L("Capítulos","Chapters")}">${TABS.map((z,i)=>`<button role="tab" id="tab-${z[0]}" aria-selected="${z[0]===tab}" aria-controls="msg" data-k="${z[0]}"><i>${i+1}</i>${L(z[1],z[2])}</button>`).join("")}</div>
   <div class="story"><p class="msg" id="msg" role="tabpanel"></p>
-   <div class="storyui"><span class="vbadge">${IC.mic}<span id="vname">${L("Voz","Voice")}: ${t.voiceL}</span></span>
+   <div class="storyui">
     <div class="grp"><button class="ghost" id="say">${IC.play}<span>${L("Escuchar","Listen")}</span></button><button id="nextCh">${L("Siguiente capítulo","Next chapter")}</button></div></div></div>
   <div class="lab"><h3>${IC.flask}${t.gT}</h3><p class="hint">${t.gH}</p><div id="game"></div></div>
   <div class="facts">
@@ -1144,7 +1144,6 @@ function render(r){
  $("#nextCh").addEventListener("click",()=>{const i=TABS.findIndex(z=>z[0]===tab);if(i<3)goTab(TABS[i+1][0],true);else tune(nextId())});
  $("#nextSig").addEventListener("click",()=>tune(nextId()));
  goTab(tab,false);oscLoop();
- {const v=pickVoice(r.id);if(canSpeak&&v)$("#vname").textContent=`${L("Voz","Voice")}: ${t.voiceL} (${voiceName(v)})`}
  gameCleanup=GAMES[r.game]($("#game"))||null;
  if(sound&&autoVoice)setTimeout(()=>{if(cur===r&&tab==="a"&&!speaking)readAloud()},350);
 }
@@ -1177,10 +1176,10 @@ function typeText(text){const el=$("#msg");clearInterval(typer);el.classList.rem
 function sayUI(on){const b=$("#say");if(!b)return;b.innerHTML=on?`${IC.stop}<span>${L("Parar","Stop")}</span>`:`${IC.play}<span>${L("Escuchar","Listen")}</span>`;b.setAttribute("aria-pressed",on)}
 function readAloud(){
  const el=$("#msg"),text=T_(cur).ch[tab],who=cur.id;
- if(!canSpeak){$("#vname").textContent=L("Tu navegador no lee en voz alta","Your browser can't read aloud");typeText(text);return}
+ if(!canSpeak){toast(L("Tu navegador no lee en voz alta","Your browser can't read aloud"));typeText(text);return}
  if(!sound){toast(L("Activá el sonido arriba para escuchar","Turn on sound at the top to listen"));setSound(true)}
  renderWords(el,text,true);
- const v=pickVoice(who);$("#vname").textContent=`${L("Voz","Voice")}: ${T_(cur).voiceL}${v?` (${voiceName(v)})`:""}`;el._b=false;setTimeout(()=>{if(!el._b&&speaking)el.classList.remove("karaoke")},1600);
+ const v=pickVoice(who);el._b=false;setTimeout(()=>{if(!el._b&&speaking)el.classList.remove("karaoke")},1600);
  const ok=speak(text,who,{onstart:()=>sayUI(true),onend:()=>{sayUI(false);if(el._sp)el._sp.forEach(s=>{s.classList.remove("now");s.classList.add("past")})},
   onword:(idx,bd)=>{if(bd)el._b=true;if(!el._st||(!bd&&!el._b&&el._i>-1))return;let lo=0,hi=el._st.length-1,j=0;while(lo<=hi){const m=(lo+hi)>>1;if(el._st[m]<=idx){j=m;lo=m+1}else hi=m-1}if(j===el._i)return;el._i=j;el._sp.forEach((s,q)=>{s.classList.toggle("past",q<j);s.classList.toggle("now",q===j)})}});
  if(!ok)typeText(text);
