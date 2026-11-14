@@ -1249,7 +1249,7 @@ rueda(el){
 odometro(el){
  el.innerHTML=`<div class="stage"><div class="odo"><span id="km">0${L(",",".")}00</span> <small>km, ${L("año","year")} <span id="yr">2004</span></small></div>
   <div class="race"><div class="trk"><div class="fill" id="of"></div><div class="mk" style="left:${42.195/50*100}%"></div><svg class="rv" id="rv" viewBox="0 0 30 22"><rect x="4" y="4" width="22" height="9" rx="2" fill="#ffd9c2"/><rect x="2" y="2" width="26" height="3" fill="#2d6b8a"/><circle cx="7" cy="17" r="4" fill="#222"/><circle cx="15" cy="17" r="4" fill="#222"/><circle cx="23" cy="17" r="4" fill="#222"/></svg></div>
-  <span>${L("Marca verde: una maratón (42,195 km)","Green mark: a marathon (42.195 km)")}</span></div></div>
+  <span>${L("Marca roja: una maratón (42,195 km)","Red mark: a marathon (42.195 km)")}</span></div></div>
   <div class="ctrl"><button>${IC.play}<span>${L("Arrancar el odómetro","Start the odometer")}</span></button></div><p class="out" aria-live="polite"></p>`;
  const b=$("button",el),out=$(".out",el);let raf=0;
  b.onclick=()=>{b.disabled=true;out.textContent="";sfx.click();const t0=performance.now(),D=RM?1:5000;let pass=false;
