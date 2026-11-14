@@ -1,6 +1,6 @@
 # Señales de Marte
 
-Experiencia web interactiva, en un solo archivo HTML, para sintonizar las "señales dormidas" de 8 robots de la NASA en Marte y escuchar su historia en primera persona. Prototipo para el **NASA Space Apps Challenge 2026**. No es un producto oficial de la NASA.
+Experiencia web interactiva para sintonizar las "señales dormidas" de 8 robots de la NASA en Marte y escuchar su historia en primera persona. Prototipo para el **NASA Space Apps Challenge 2026**. No es un producto oficial de la NASA.
 
 **Robots:** Viking 1, Viking 2, Sojourner, Spirit, Opportunity, Phoenix, InSight e Ingenuity.
 
@@ -64,13 +64,6 @@ Todo está en un único `.html` (CSS, HTML y JS). Lo principal del script:
 - `SRC`: lista de fuentes que se muestra en la página.
 - `sfx`: sonidos generados con Web Audio.
 
-## Agregar un robot
-
-1. Sumá un objeto a `R` con `id`, `name`, `lat`, `lon`, fechas, actividad (`game`) y los textos `es` / `en`.
-2. Si tiene actividad nueva, agregá la función en `GAMES`.
-3. Cargá su foto en `IMG` / `MEDIA` y su modelo en `NASA3D` si corresponde.
-4. Sumá su perfil de voz en `VOICES` y `VPROF`.
-5. Agregá las fuentes en `SRC`.
 
 ## Datos guardados en el navegador
 
