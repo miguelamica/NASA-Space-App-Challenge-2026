@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Señales de Marte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cálido y curioso, para chicos de 9 a 13; cada robot habla en primera persona.
+   IDEA: una vieja consola receptora de la NASA que sintoniza señales dormidas en Marte.
+   PICTURE: mapa de Marte en una pantalla de radar, con 8 señales reales titilando por lat/long.
+   COLOUR/TYPE: óxido marciano + arena, acento verde-señal; Chakra Petch (consola) + Atkinson Hyperlegible (lectura).
+   LAYOUT: pantalla-mapa + receptor lado a lado, línea de vida debajo, credencial y fuentes al final. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f4e6d6,#170c08);--ink:light-dark(#2a140b,#f4e4d4);--soft:light-dark(#6e4a38,#c9a892);
+--card:light-dark(#fff8f0,#22130d);--line:light-dark(#e2c8b0,#3a2219);
+--rust:light-dark(#b8441c,#e0703f);--sig:light-dark(#0f7a68,#56d6bf);--scr:#120806}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.con{font-family:"Chakra Petch",system-ui,sans-serif}
+h1{font-size:clamp(34px,5vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+h2{font-size:clamp(26px,3.4vw,36px);line-height:1.1;margin:0 0 12px;text-wrap:balance}
+h3{font-size:22px;line-height:1.15;margin:0}
+a{color:var(--rust)}
+button{font:600 16px "Chakra Petch",system-ui,sans-serif;min-height:44px;padding:8px 16px;border-radius:10px;border:2px solid var(--rust);background:var(--rust);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--rust)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible{outline:3px solid var(--sig);outline-offset:3px}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header.band{padding-bottom:12px}
+.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+.lede{max-width:62ch;color:var(--soft);margin:10px 0 0}
+.meter{font-family:"Chakra Petch";font-size:18px;display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:5px}.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--sig)}.dots i.on{background:var(--sig)}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
+.screen{background:var(--scr);border-radius:18px;padding:14px;box-shadow:inset 0 0 0 2px #3b1d12,0 18px 40px -20px #000a;position:relative}
+.screen .bar{display:flex;justify-content:space-between;color:#d9a184;font:600 13px "Chakra Petch";padding:2px 6px 10px;letter-spacing:.02em}
+.map{position:relative;aspect-ratio:2/1;border-radius:10px;overflow:hidden}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{cursor:pointer}.pin .ring{transform-box:fill-box;transform-origin:center;animation:pulse 2.2s ease-out infinite}
+.pin.heard .core{fill:#56d6bf}.pin.heard .ring{stroke:#56d6bf}
+.pin.sel .core{fill:#fff}
+.pin text{font:600 13px "Chakra Petch";fill:#fbe3d2;paint-order:stroke;stroke:#120806;stroke-width:4px}
+.pin:focus{outline:none}.pin:focus-visible .core{stroke:#56d6bf;stroke-width:3}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.mapnote{color:#b48b76;font-size:13px;margin:8px 4px 0}
+.rx{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px;min-height:520px;position:relative;overflow:hidden}
+.rx .freq{font:600 13px "Chakra Petch";color:var(--sig);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.empty{display:grid;place-items:center;text-align:center;min-height:440px;color:var(--soft)}
+.empty b{display:block;font:600 24px "Chakra Petch";color:var(--ink);margin-bottom:6px}
+#noise{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:3}
+.who{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:6px 0 14px}
+.who p{margin:2px 0 0;color:var(--soft);font-size:15px}
+.life{display:grid;gap:6px;margin:0 0 16px;font-size:14px}
+.life .row{display:grid;gap:3px}
+.life .trk{height:14px;border-radius:7px;background:var(--line);overflow:hidden}
+.life .fill{height:100%;border-radius:7px;background:var(--soft);width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.life .real .fill{background:var(--rust)}
+.life .row span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tabs button{background:transparent;color:var(--ink);border-color:var(--line);font-size:15px;padding:6px 12px}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.msg{font-size:18px;min-height:7.5em;margin:0 0 14px}
+.msg::after{content:"▍";color:var(--sig);animation:blink 1s steps(1) infinite}
+.msg.done::after{content:""}
+@keyframes blink{50%{opacity:0}}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.play{border-top:2px dashed var(--line);padding-top:16px}
+.play h3{font-size:19px;margin-bottom:4px}.play .hint{color:var(--soft);font-size:15px;margin:0 0 10px}
+.stage{border-radius:12px;overflow:hidden;background:#2a140c;position:relative}
+.stage canvas,.stage svg{display:block;width:100%}
+.out{font-size:15px;margin:10px 0 0;min-height:1.6em;color:var(--sig);font-weight:700}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.sgrid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;padding:6px;background:#3a1e12}
+.sgrid div{aspect-ratio:1;background:#8a4a2c;border-radius:4px;display:grid;place-items:center;font:700 11px "Chakra Petch";color:#fff;text-align:center;line-height:1}
+.sgrid .rock{background:#5b3524}.sgrid .lander{background:#c9b8a8;color:#2a140c}.sgrid .rov{background:#56d6bf;color:#120806}.sgrid .done{outline:3px solid #56d6bf}
+.pad{display:grid;grid-template-columns:repeat(3,48px);gap:4px}
+.pad button{padding:0;min-width:48px}
+.odo{font:700 clamp(36px,7vw,56px) "Chakra Petch";color:#ffd9c2;padding:14px 16px 4px}
+.odo small{font-size:16px;color:#d9a184}
+.race{padding:0 16px 16px;display:grid;gap:8px;color:#f4e4d4;font-size:14px}
+.race .trk{height:12px;background:#4a2618;border-radius:6px;position:relative}
+.race .fill{height:100%;background:#e0703f;border-radius:6px;width:0}
+.race .mk{position:absolute;top:-4px;bottom:-4px;width:3px;background:#56d6bf}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:16px 0 0;font-size:14px}
+.facts div{background:var(--bg);border-radius:10px;padding:8px 10px}.facts b{display:block;font-size:12px;color:var(--soft);font-weight:400}
+.src{font-size:13px;color:var(--soft);margin-top:12px}
+.tl{display:grid;gap:6px}
+.tl .r{display:grid;grid-template-columns:minmax(0,8.5em) minmax(0,1fr);gap:12px;align-items:center;cursor:pointer;border-radius:8px;padding:4px 6px}
+.tl .r:hover,.tl .r.sel{background:var(--card)}
+.tl .t{position:relative;height:16px;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px calc(100%/5))}
+.tl .t i{position:absolute;top:2px;bottom:2px;border-radius:6px;background:var(--rust);min-width:6px}
+.tl .r.heard .t i{background:var(--sig)}
+.axis{display:flex;justify-content:space-between;margin-left:calc(8.5em + 18px);font:600 13px "Chakra Petch";color:var(--soft)}
+.end{background:var(--rust);color:#fff4ea}
+.end .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+.end p{max-width:60ch}
+.cred{background:#170c08;color:#f4e4d4;border-radius:18px;padding:22px;border:2px solid #56d6bf;font-family:"Chakra Petch";position:relative;overflow:hidden}
+.cred .k{color:#56d6bf;font-size:14px}.cred .n{font-size:clamp(26px,4vw,38px);line-height:1.1;margin:8px 0}
+.cred .st{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.cred .st span{font-size:12px;border:1px solid #56d6bf;border-radius:20px;padding:2px 8px}
+.cred.locked{opacity:.55;filter:grayscale(.6)}
+.end input{font:16px "Atkinson Hyperlegible";min-height:44px;padding:8px 12px;border-radius:10px;border:2px solid #fff4ea;background:#fff4ea;color:#2a140b;width:min(100%,280px)}
+.end button{background:#170c08;border-color:#170c08}
+.srcs{columns:2 280px;font-size:15px;padding-left:18px}.srcs li{margin-bottom:6px;break-inside:avoid}
+#intro{position:fixed;inset:0;z-index:20;background:#0d0604;color:#f4e4d4;display:grid;place-items:center;padding:24px}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.16}
+#intro .box{position:relative;max-width:620px;text-align:center}
+#intro p{font:600 clamp(20px,3vw,28px)/1.35 "Chakra Petch";min-height:6.5em;margin:0 0 20px}
+#intro button{font-size:18px;padding:12px 26px}
+@media(max-width:900px){.grid,.end .grid2{grid-template-columns:minmax(0,1fr)}.rx{min-height:0}.empty{min-height:200px}}
+@media(max-width:600px){.tl .r{grid-template-columns:minmax(0,6.5em) minmax(0,1fr)}.axis{margin-left:calc(6.5em + 18px)}.pin text{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.pin .ring,.msg::after{animation:none}.life .fill{transition:none}}
+.meter .lang{min-height:40px;padding:6px 12px;font-size:15px}
+</style>
+</head>
+<body>
+<div id="intro" role="dialog" aria-label="Intro">
+  <canvas id="icv" aria-hidden="true"></canvas>
+  <div class="box"><p id="itext" aria-live="polite"></p>
+  <div class="ctrl" style="justify-content:center"><button id="ion" data-en="Turn on the radio">Encender la radio</button><button class="ghost lang" id="ilang" style="color:#f4e4d4;border-color:#f4e4d4">English</button></div></div>
+</div>
+
+<header class="band"><div class="wrap top">
+  <div><h1 data-en="Signals from Mars">Señales de Marte</h1>
+  <p class="lede" data-en="Since 1976, NASA has sent robots to Mars. Many have gone quiet, but they are still there. You run an old receiver console: tune in to each signal and let the robots tell you their stories.">Desde 1976 la NASA mandó robots a Marte. Muchos dejaron de hablar, pero siguen ahí. Sos operador de una vieja consola: sintonizá cada señal y dejá que te cuenten su historia.</p></div>
+  <div class="meter" aria-live="polite"><span><span data-en="Signals recovered">Señales recuperadas</span> <b id="cnt">0</b>/8</span><span class="dots" id="dots"></span><button class="ghost lang" id="lang" aria-label="Cambiar idioma / Change language">English</button></div>
+</div></header>
+
+<main>
+<section class="band" style="padding-top:12px"><div class="wrap grid">
+  <div>
+    <div class="screen">
+      <div class="bar"><span data-en="RECEIVER · MARS">RECEPTOR · MARTE</span><span id="clock"></span></div>
+      <div class="map"><svg id="map" viewBox="0 0 720 360" role="group" aria-label="Mars map / Mapa de Marte"></svg></div>
+      <p class="mapnote" data-en="Illustrated map. Each signal sits at its robot's real latitude and longitude. Tap one to tune in.">Mapa ilustrativo. Cada señal está en la latitud y longitud reales de su robot. Tocá una para sintonizarla.</p>
+    </div>
+  </div>
+  <div class="rx" id="rx" aria-live="polite">
+    <canvas id="noise" aria-hidden="true"></canvas>
+    <div id="rxbody"></div>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2 data-en="How long did each one last?">¿Cuánto vivió cada uno?</h2>
+  <p class="lede" style="margin:0 0 16px" data-en="Each bar runs from the day the robot started working on Mars to its last message. Almost all of them lasted far longer than their engineers expected.">Cada barra va desde que empezó a trabajar en Marte hasta su último mensaje. Casi todos duraron muchísimo más de lo que esperaban sus ingenieros.</p>
+  <div class="tl" id="tl"></div>
+  <div class="axis" aria-hidden="true"><span>1975</span><span>1985</span><span>1995</span><span>2005</span><span>2015</span><span>2025</span></div>
+</div></section>
+
+<section class="band end"><div class="wrap grid2">
+  <div>
+    <h2 data-en="Passing the torch">El relevo</h2>
+    <p data-en="What these robots learned paved the way for the ones working today. Pathfinder's airbags protected Spirit and Opportunity. Phoenix lent its design to InSight. Ingenuity proved you can fly on Mars. And on October 11, 2026, the Perseverance rover broke Opportunity's driving record, which had stood for more than a decade.">Lo que aprendieron estos robots armó el camino para los que trabajan hoy. Las bolsas de aire de Pathfinder protegieron a Spirit y Opportunity. Phoenix prestó su diseño a InSight. Ingenuity probó que se puede volar en Marte. Y el 11 de octubre de 2026, el rover Perseverance superó el récord de distancia de Opportunity, que había durado más de una década.</p>
+    <p data-en="Recover all 8 signals and your Mars Guardian badge will be ready.">Cuando recuperes las 8 señales, tu credencial de Guardián de Marte queda lista.</p>
+    <form id="cf" class="ctrl"><label for="nm" style="position:absolute;left:-9999px" data-en="Your name">Tu nombre</label><input id="nm" maxlength="28"><button data-en="Sign badge">Firmar credencial</button></form>
+  </div>
+  <div class="cred locked" id="cred">
+    <div class="k" data-en="BADGE · MARS SIGNALS CONSOLE">CREDENCIAL · CONSOLA DE SEÑALES DE MARTE</div>
+    <div class="n" id="cn"></div>
+    <div id="cs"></div>
+    <div class="st" id="cst"></div>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2 data-en="Is it true?">¿Es verdad?</h2>
+  <p class="lede" style="margin:0 0 12px" data-en="Every fact comes from official NASA sources. The photos and sounds in the games are re-creations; the links lead to the originals.">Todos los datos salen de fuentes oficiales de la NASA. Las fotos y sonidos de los juegos son recreaciones; los enlaces llevan a los originales.</p>
+  <ul class="srcs">
+    <li><a href="https://nssdc.gsfc.nasa.gov/" data-en="NSSDCA: NASA's official spacecraft catalog">NSSDCA: catálogo oficial de naves de la NASA</a></li>
+    <li><a href="https://science.nasa.gov/mission/viking-1/">Viking 1 (NASA Science)</a></li>
+    <li><a href="https://science.nasa.gov/mission/viking/viking-2">Viking 2 (NASA Science)</a></li>
+    <li><a href="https://science.nasa.gov/mission/mars-pathfinder/" data-en="Mars Pathfinder and Sojourner">Mars Pathfinder y Sojourner</a></li>
+    <li><a href="https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/" data-en="Spirit and Opportunity">Spirit y Opportunity</a></li>
+    <li><a href="https://science.nasa.gov/mission/phoenix">Phoenix</a></li>
+    <li><a href="https://science.nasa.gov/mission/insight/">InSight</a></li>
+    <li><a href="https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/">Ingenuity</a></li>
+    <li><a href="https://soundcloud.com/nasa/quake-sol-173" data-en="Real sound of a marsquake (sol 173)">Sonido real de un marsquake (sol 173)</a></li>
+  </ul>
+  <p class="src" data-en="Prototype for the 2026 NASA Space Apps Challenge.">Prototipo para el NASA Space Apps Challenge 2026.</p>
+</div></section>
+</main>
+
+<script>
+{
+let lang="es";try{lang=localStorage.getItem("sdm-lang")||"es"}catch(e){}
+const L=(es,en)=>lang==="en"?en:es;
+const LC=()=>lang==="en"?"en-US":"es-AR";
+const R=[
+{id:"viking1",name:"Viking 1",lat:22.27,lon:-47.95,side:-1,start:"1976-07-20",end:"1982-11-13",plan:90,game:"foto",
+es:{kind:"Lander · 1976",place:"Chryse Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",gT:"Recibí la primera foto",gH:"Mis cámaras no sacaban la foto de golpe: la armaban en franjas verticales que viajaban hasta la Tierra.",
+ch:{a:"Me llamo Viking 1. El 20 de julio de 1976 me separé de mi nave orbital y bajé a una llanura que llamaron Chryse Planitia, las Llanuras de Oro. Fui la primera nave de Estados Unidos en posarse sana y salva en Marte.",
+b:"Tenía dos cámaras que escaneaban el paisaje franja por franja, un brazo con pala para juntar tierra, un sismómetro, una estación del clima y un pequeño laboratorio químico. Mi energía no venía del Sol sino de generadores nucleares, y por eso pude trabajar tantos años.",
+c:"Minutos después de aterrizar mandé la primera foto tomada en la superficie de Marte. Después hice tres experimentos para buscar vida en el suelo. Los resultados fueron confusos y la mayoría de los científicos cree que no había vida ahí, pero le enseñé a la humanidad cómo buscarla.",
+d:"Durante años mandé reportes del clima marciano, primero cada día y después cada semana. En noviembre de 1982 una orden enviada desde la Tierra borró por error las instrucciones para apuntar mi antena. Nunca más pudieron oírme. Sigo acá, mirando las Llanuras de Oro."}},
+en:{kind:"Lander · 1976",place:"Chryse Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",gT:"Receive the first photo",gH:"My cameras didn't snap a picture all at once: they built it in vertical strips that traveled to Earth.",
+ch:{a:"My name is Viking 1. On July 20, 1976, I separated from my orbiter and came down on a plain called Chryse Planitia, the Plains of Gold. I was the first United States spacecraft to land safely on Mars.",
+b:"I had two cameras that scanned the landscape strip by strip, a scoop arm to collect soil, a seismometer, a weather station and a small chemistry lab. My power didn't come from the Sun but from nuclear generators, which is why I could work for so many years.",
+c:"Minutes after landing I sent the first photo ever taken on the surface of Mars. Then I ran three experiments to look for life in the soil. The results were confusing, and most scientists think there was no life there, but I taught humanity how to search for it.",
+d:"For years I sent Martian weather reports, first every day and later every week. In November 1982, a command sent from Earth accidentally erased the instructions for pointing my antenna. No one could hear me ever again. I'm still here, watching over the Plains of Gold."}}},
+{id:"viking2",name:"Viking 2",lat:47.64,lon:134.29,side:-1,start:"1976-09-03",end:"1980-04-11",plan:90,game:"escarcha",
+es:{kind:"Lander · 1976",place:"Utopia Planitia",planL:"90 días",energy:"Nuclear (generadores RTG)",gT:"Llegó el invierno",gH:"Cambiá de estación y mirá qué aparece sobre las piedras.",
+ch:{a:"Soy Viking 2, el gemelo. Aterricé el 3 de septiembre de 1976 en Utopia Planitia, mucho más al norte que mi hermano, en un campo lleno de piedras.",
+b:"Tenía los mismos instrumentos que Viking 1: cámaras, brazo con pala, laboratorio para buscar vida y estación del clima. Con dos gemelos en lugares distintos, los científicos podían comparar dos rincones de Marte.",
+c:"Como estaba tan al norte, viví inviernos muy fríos. En uno de ellos fotografié una capa finísima de escarcha blanca sobre el suelo rojo. ¡Hielo en Marte, visto desde el propio suelo!",
+d:"Mis baterías se fueron gastando. El 11 de abril de 1980 llegaron a la Tierra mis últimos datos. Mi hermano siguió hablando dos años más que yo."}},
+en:{kind:"Lander · 1976",place:"Utopia Planitia",planL:"90 days",energy:"Nuclear (RTG generators)",gT:"Winter is coming",gH:"Change the season and see what shows up on the rocks.",
+ch:{a:"I'm Viking 2, the twin. I landed on September 3, 1976, in Utopia Planitia, much farther north than my sibling, in a field full of rocks.",
+b:"I carried the same instruments as Viking 1: cameras, a scoop arm, a lab to look for life and a weather station. With twins in two different places, scientists could compare two corners of Mars.",
+c:"Because I was so far north, I lived through very cold winters. In one of them I photographed a super-thin layer of white frost on the red ground. Ice on Mars, seen from the ground itself!",
+d:"My batteries slowly wore out. My last data reached Earth on April 11, 1980. My sibling kept talking for two more years."}}},
+{id:"sojourner",name:"Sojourner",lat:19.13,lon:-33.22,side:1,start:"1997-07-04",end:"1997-09-27",plan:7,real:83,game:"manejar",
+es:{kind:"Rover · 1997",place:"Ares Vallis",planL:"7 días",realL:"83 días",energy:"Solar",gT:"Manejá a Sojourner",gH:"Llevalo hasta las rocas Yogi y Barnacle Bill para analizarlas. Usá los botones o las flechas del teclado.",
+ch:{a:"Soy Sojourner, el primer rover que rodó en otro planeta. Viajé plegado dentro del lander Mars Pathfinder, que el 4 de julio de 1997 cayó envuelto en bolsas de aire y rebotó sobre Ares Vallis, una antigua llanura de inundaciones.",
+b:"Era del tamaño de un horno microondas y pesaba 10,5 kg. Tenía seis ruedas, un panel solar y un espectrómetro para saber de qué estaban hechas las rocas. Las órdenes tardaban minutos en llegar desde la Tierra, así que mis conductores planeaban cada movimiento con mucho cuidado.",
+c:"Analicé rocas a las que el equipo les puso nombres de dibujos animados, como Yogi y Barnacle Bill. Las pistas mostraron que esa llanura se formó con inundaciones: Marte había tenido mucha más agua.",
+d:"Me prometieron 7 días de trabajo y duré 83. El 27 de septiembre de 1997 mi lander dejó de comunicarse, probablemente por una batería gastada, y sin él yo no podía hablar con la Tierra. A mi lander lo rebautizaron Estación Memorial Carl Sagan."}},
+en:{kind:"Rover · 1997",place:"Ares Vallis",planL:"7 days",realL:"83 days",energy:"Solar",gT:"Drive Sojourner",gH:"Take it to the rocks Yogi and Barnacle Bill to analyze them. Use the buttons or your keyboard arrows.",
+ch:{a:"I'm Sojourner, the first rover to roll across another planet. I traveled folded up inside the Mars Pathfinder lander, which on July 4, 1997, fell wrapped in airbags and bounced onto Ares Vallis, an ancient flood plain.",
+b:"I was the size of a microwave oven and weighed 10.5 kg. I had six wheels, a solar panel and a spectrometer to find out what rocks were made of. Commands took minutes to arrive from Earth, so my drivers planned every move very carefully.",
+c:"I analyzed rocks the team named after cartoon characters, like Yogi and Barnacle Bill. The clues showed that the plain was shaped by floods: Mars once had much more water.",
+d:"They promised me 7 days of work and I lasted 83. On September 27, 1997, my lander stopped communicating, probably because of a worn-out battery, and without it I couldn't talk to Earth. My lander was renamed the Carl Sagan Memorial Station."}}},
+{id:"spirit",name:"Spirit",lat:-14.57,lon:175.47,side:-1,start:"2004-01-03",end:"2010-03-22",plan:92,game:"rueda",
+es:{kind:"Rover · 2004",place:"Cráter Gusev",planL:"90 soles",energy:"Solar",gT:"Arrastrá la rueda rota",gH:"Pasá el dedo o el mouse por el suelo, como hacía mi rueda trabada.",
+ch:{a:"Soy Spirit. El 3 de enero de 2004 llegué rebotando en bolsas de aire al cráter Gusev, un cráter gigante que podría haber sido un lago.",
+b:"Seis ruedas, paneles solares, cámaras, un brazo robótico con microscopio y una herramienta para raspar rocas. Me diseñaron para trabajar 90 soles. Un sol es un día marciano: dura 24 horas y 39 minutos.",
+c:"En 2006 se me rompió la rueda delantera derecha y empecé a manejar marcha atrás, arrastrándola. En 2007 esa rueda trabada raspó el suelo y dejó al descubierto una tierra blanquísima: era sílice. En la Tierra se forma cerca de aguas termales o vapor volcánico. ¡Una avería me llevó a uno de mis mejores descubrimientos!",
+d:"En 2009 me quedé atascado en arena blanda. Seguí estudiando como estación fija, pero no pude inclinar mis paneles hacia el Sol para pasar el invierno. Mi última comunicación fue en marzo de 2010. Recorrí 7,7 km."}},
+en:{kind:"Rover · 2004",place:"Gusev Crater",planL:"90 sols",energy:"Solar",gT:"Drag the broken wheel",gH:"Run your finger or mouse across the ground, just like my stuck wheel did.",
+ch:{a:"I'm Spirit. On January 3, 2004, I arrived bouncing on airbags into Gusev Crater, a giant crater that may once have been a lake.",
+b:"Six wheels, solar panels, cameras, a robotic arm with a microscope and a tool for grinding rocks. I was designed to work for 90 sols. A sol is a Martian day: it lasts 24 hours and 39 minutes.",
+c:"In 2006 my front right wheel broke, so I started driving backwards, dragging it. In 2007 that stuck wheel scraped the ground and uncovered bright white soil: it was silica. On Earth, it forms near hot springs or volcanic steam. A breakdown led me to one of my best discoveries!",
+d:"In 2009 I got stuck in soft sand. I kept doing science as a stationary station, but I couldn't tilt my panels toward the Sun to survive the winter. My last communication was in March 2010. I drove 7.7 km."}}},
+{id:"opportunity",name:"Opportunity",lat:-1.95,lon:-5.53,side:1,start:"2004-01-24",end:"2018-06-10",plan:92,game:"odometro",
+es:{kind:"Rover · 2004",place:"Meridiani Planum",planL:"90 soles",energy:"Solar",gT:"Mi odómetro",gH:"Mirá cuánto recorrí comparado con una maratón.",
+ch:{a:"Soy Opportunity, gemelo de Spirit. Aterricé el 24 de enero de 2004 en Meridiani Planum y, después de rebotar en mis bolsas de aire, terminé justo adentro de un cráter chiquito. ¡Como embocar un hoyo en uno!",
+b:"Mismo cuerpo que mi gemelo: seis ruedas, paneles solares, brazo con microscopio y herramienta para raspar rocas. A veces el viento me limpiaba el polvo de los paneles, y eso me regaló años extra de vida.",
+c:"Encontré bolitas de hematita que los científicos apodaron arándanos, y rocas en capas que se forman con agua. Con Spirit confirmamos que hace mucho tiempo hubo agua en la superficie de Marte durante largos períodos.",
+d:"Me esperaban 90 soles y trabajé casi 15 años, recorriendo 45,16 km: más que una maratón. En 2018 una tormenta de polvo cubrió todo el planeta y tapó el Sol. Mi último contacto fue el 10 de junio de 2018. Mi récord de distancia duró hasta octubre de 2026."}},
+en:{kind:"Rover · 2004",place:"Meridiani Planum",planL:"90 sols",energy:"Solar",gT:"My odometer",gH:"See how far I drove compared with a marathon.",
+ch:{a:"I'm Opportunity, Spirit's twin. I landed on January 24, 2004, in Meridiani Planum and, after bouncing on my airbags, rolled right into a tiny crater. Like a hole in one!",
+b:"Same body as my twin: six wheels, solar panels, an arm with a microscope and a rock-grinding tool. Sometimes the wind cleaned the dust off my panels, and that gave me extra years of life.",
+c:"I found little balls of hematite that scientists nicknamed blueberries, and layered rocks that form in water. Together with Spirit, we confirmed that long ago water stayed on the surface of Mars for long periods.",
+d:"They expected 90 sols and I worked for almost 15 years, driving 45.16 km: more than a marathon. In 2018 a dust storm covered the whole planet and blocked out the Sun. My last contact was on June 10, 2018. My distance record lasted until October 2026."}}},
+{id:"phoenix",name:"Phoenix",lat:68.22,lon:-125.75,side:1,start:"2008-05-25",end:"2008-11-02",plan:92,game:"hielo",
+es:{kind:"Lander · 2008",place:"Ártico marciano",planL:"unos 3 meses",energy:"Solar",gT:"Cavá la zanja",gH:"Raspá el suelo y después esperá unos soles.",
+ch:{a:"Soy Phoenix. Mi nombre viene del ave que renace de sus cenizas: me armaron con un lander guardado de una misión cancelada. El 25 de mayo de 2008 aterricé en las llanuras árticas de Marte, más al norte que ninguna nave antes.",
+b:"No tenía ruedas: era un laboratorio fijo con un brazo-pala, hornitos para calentar muestras y una estación del clima. Fui a buscar el hielo que un satélite había detectado escondido bajo el suelo.",
+c:"Con mi brazo cavé zanjas y aparecieron trocitos blancos y brillantes. A los pocos días habían desaparecido: pasaron directo al aire. ¡Era hielo de agua! También encontré en el suelo unas sales llamadas percloratos.",
+d:"Mi misión era de unos tres meses en el Ártico, y todos sabíamos que el invierno iba a llegar. Con menos sol me fui quedando sin energía. Mi última señal llegó el 2 de noviembre de 2008. Fui el primero en mandar datos desde una región polar de Marte."}},
+en:{kind:"Lander · 2008",place:"Martian Arctic",planL:"about 3 months",energy:"Solar",gT:"Dig the trench",gH:"Scrape the ground, then wait a few sols.",
+ch:{a:"I'm Phoenix. My name comes from the bird that rises from its ashes: I was built from a lander kept in storage after a canceled mission. On May 25, 2008, I landed on the Arctic plains of Mars, farther north than any spacecraft before.",
+b:"I had no wheels: I was a stationary lab with a scoop arm, tiny ovens to heat samples and a weather station. I went looking for the ice a satellite had detected hidden under the ground.",
+c:"I dug trenches with my arm and bright white bits appeared. A few days later they were gone: they turned straight into gas. It was water ice! I also found salts called perchlorates in the soil.",
+d:"My mission was about three months in the Arctic, and everyone knew winter was coming. With less sunlight, I slowly ran out of power. My last signal arrived on November 2, 2008. I was the first to send data from a polar region of Mars."}}},
+{id:"insight",name:"InSight",lat:4.5,lon:135.9,side:-1,start:"2018-11-26",end:"2022-12-15",plan:728,game:"sismo",
+es:{kind:"Lander · 2018",place:"Elysium Planitia",planL:"1 año marciano",energy:"Solar",gT:"Escuchá un marsquake",gH:"Recreación del sismógrafo. El sonido real lo publicó la NASA (enlace abajo).",
+ch:{a:"Soy InSight. Aterricé el 26 de noviembre de 2018 en Elysium Planitia, una llanura cerca del ecuador. La eligieron por segura: yo no venía a mirar el paisaje, venía a escuchar el interior del planeta.",
+b:"Mi diseño se basó en el de Phoenix. Con mi brazo robótico, de más de 1,8 m, levanté un sismómetro y lo apoyé en el suelo bajo una cúpula. También tenía una sonda para medir el calor que sale de adentro de Marte.",
+c:"Fui el primer explorador en estudiar a fondo el interior de Marte: corteza, manto y núcleo. Escuché cientos de marsquakes, los terremotos marcianos, y hasta golpes de meteoritos. Hasta oí el viento haciendo vibrar mi cuerpo.",
+d:"El polvo se fue acumulando sobre mis paneles solares y cada día tenía menos energía. Mi misión terminó el 15 de diciembre de 2022. Desde la órbita me siguen fotografiando para estudiar cómo se mueve el polvo."}},
+en:{kind:"Lander · 2018",place:"Elysium Planitia",planL:"1 Mars year",energy:"Solar",gT:"Listen to a marsquake",gH:"A re-creation of the seismograph. NASA published the real sound (link below).",
+ch:{a:"I'm InSight. I landed on November 26, 2018, in Elysium Planitia, a plain near the equator. It was chosen because it was safe: I didn't come to look at the scenery, I came to listen to the inside of the planet.",
+b:"My design was based on Phoenix. With my robotic arm, more than 1.8 m long, I lifted a seismometer and set it on the ground under a dome. I also had a probe to measure the heat coming from inside Mars.",
+c:"I was the first explorer to study the inside of Mars in depth: crust, mantle and core. I heard hundreds of marsquakes, and even meteorite impacts. I even heard the wind shaking my body.",
+d:"Dust kept piling up on my solar panels, and every day I had less power. My mission ended on December 15, 2022. Orbiters still photograph me to study how dust moves."}}},
+{id:"ingenuity",name:"Ingenuity",lat:18.44,lon:77.45,side:1,start:"2021-04-19",end:"2024-01-18",plan:5,real:72,game:"vuelo",
+es:{kind:"Helicóptero · 2021",place:"Cráter Jezero",planL:"5 vuelos",realL:"72 vuelos",energy:"Solar + batería",gT:"¡A volar!",gH:"Hacé despegar a Ingenuity. ¿Llegás a los 72 vuelos?",
+ch:{a:"Soy Ingenuity, un helicóptero de 1,8 kg. Viajé a Marte enganchado debajo del rover Perseverance, que aterrizó en el cráter Jezero en febrero de 2021. Mi primera prueba fue sobrevivir sola a una noche helada marciana.",
+b:"Tengo dos hélices que giran en sentidos opuestos, muy rápido, porque el aire de Marte es finísimo. Panel solar, batería y cámaras. Llevo un pedacito de tela del avión de los hermanos Wright, el primero que voló en la Tierra.",
+c:"El 19 de abril de 2021 hice el primer vuelo motorizado y controlado en otro planeta. Me pedían 5 vuelos de prueba en 30 días e hice 72 en casi tres años: 128,8 minutos en el aire, 17 km recorridos y hasta 24 m de altura. Fui la exploradora aérea de Perseverance.",
+d:"En mi vuelo 72, el 18 de enero de 2024, se dañaron mis hélices y ya no pude volar más. Mi misión terminó el 25 de enero de 2024. Me quedé quieta en Jezero, pero ahora sabemos que se puede volar en Marte."}},
+en:{kind:"Helicopter · 2021",place:"Jezero Crater",planL:"5 flights",realL:"72 flights",energy:"Solar + battery",gT:"Take off!",gH:"Launch Ingenuity. Can you reach 72 flights?",
+ch:{a:"I'm Ingenuity, a 1.8 kg helicopter. I traveled to Mars tucked under the belly of the Perseverance rover, which landed in Jezero Crater in February 2021. My first test was surviving a freezing Martian night on my own.",
+b:"I have two rotors that spin in opposite directions, very fast, because Mars's air is extremely thin. A solar panel, a battery and cameras. I carry a tiny piece of fabric from the Wright brothers' airplane, the first to fly on Earth.",
+c:"On April 19, 2021, I made the first powered, controlled flight on another planet. They asked me for 5 test flights in 30 days and I made 72 in almost three years: 128.8 minutes in the air, 17 km covered and up to 24 m high. I was Perseverance's aerial scout.",
+d:"On my 72nd flight, on January 18, 2024, my rotor blades were damaged and I couldn't fly anymore. My mission ended on January 25, 2024. I stand still in Jezero now, but we know you can fly on Mars."}}}
+];
+const TABS=[["a","Llegada","Arrival"],["b","Mi cuerpo","My body"],["c","Lo que descubrí","What I discovered"],["d","Mi último día","My last day"]];
+const T=r=>r[lang];
+const $=s=>document.querySelector(s);
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let heard=new Set();try{heard=new Set(JSON.parse(localStorage.getItem("sdm-heard")||"[]"))}catch(e){}
+let cur=null,cleanup=null,typer=null,tab="a";
+const days=r=>r.real||Math.round((Date.parse(r.end)-Date.parse(r.start))/864e5);
+const fmt=n=>n.toLocaleString(LC());
+const lifeL=r=>{if(T(r).realL)return T(r).realL;const d=days(r),y=Math.floor(d/365);return d>730?L(`más de ${y} años`,`over ${y} years`):L(`${fmt(d)} días`,`${fmt(d)} days`)};
+const fdate=d=>new Date(d+"T12:00").toLocaleDateString(LC(),{day:"numeric",month:"short",year:"numeric"});
+
+/* ---------- idioma ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;document.title=L("Señales de Marte","Signals from Mars");
+  document.querySelectorAll("[data-en]").forEach(e=>{if(e.dataset.es===undefined)e.dataset.es=e.textContent;e.textContent=lang==="en"?e.dataset.en:e.dataset.es});
+  document.querySelectorAll(".lang").forEach(b=>b.textContent=L("English","Español"));
+  $("#nm").placeholder=L("Escribí tu nombre","Type your name");
+  try{localStorage.setItem("sdm-lang",lang)}catch(e){}
+  drawMap();drawTL();syncHeard();
+  if(cur)render(cur);else{$("#clock").textContent=L("BARRIENDO FRECUENCIAS","SCANNING FREQUENCIES");$("#rxbody").innerHTML=`<div class="empty"><div><b>${L("Sin señal","No signal")}</b>${L("Elegí un punto que titile en el mapa<br>o una fila de la línea de vida.","Pick a blinking dot on the map<br>or a row in the lifeline.")}</div></div>`}
+  if($("#cs").dataset.signed==="1")signCred();
+}
+function toggleLang(){lang=lang==="en"?"es":"en";speakStop();applyLang()}
+
+/* ---------- mapa ---------- */
+const X=lon=>(lon+180)*2,Y=lat=>(90-lat)*2;
+function drawMap(){
+  const blobs=[[70,8,34,22,.5],[-30,47,40,16,.4],[-40,-25,50,14,.45],[0,-5,30,9,.5],[145,-20,45,12,.45],[110,45,40,14,.3],[-90,-30,30,12,.3],[20,-30,40,10,.35]];
+  const m=$("#map");
+  m.innerHTML=`<defs>
+  <radialGradient id="g" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#c8693d"/><stop offset=".7" stop-color="#9c4626"/><stop offset="1" stop-color="#5e2513"/></radialGradient>
+  <filter id="tx"><feTurbulence type="fractalNoise" baseFrequency=".018 .03" numOctaves="4" seed="7"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .08  0 0 0 0 .04  0 0 0 1.1 -.45"/></filter>
+  <filter id="bl"><feGaussianBlur stdDeviation="9"/></filter></defs>
+  <rect width="720" height="360" fill="url(#g)"/>
+  <g filter="url(#bl)" fill="#3d1a0d">${blobs.map(b=>`<ellipse cx="${X(b[0])}" cy="${Y(b[1])}" rx="${b[2]*2}" ry="${b[3]*2}" opacity="${b[4]}"/>`).join("")}</g>
+  <circle cx="${X(70)}" cy="${Y(-42)}" r="44" fill="#e8a27a" opacity=".35" filter="url(#bl)"/>
+  <rect width="720" height="360" filter="url(#tx)" opacity=".9"/>
+  <path d="M${X(-110)} ${Y(-6)} C${X(-90)} ${Y(-12)},${X(-70)} ${Y(-6)},${X(-45)} ${Y(-12)}" stroke="#3a160a" stroke-width="5" fill="none" opacity=".7"/>
+  <circle cx="${X(-134)}" cy="${Y(18.6)}" r="14" fill="#d98a5e" opacity=".5"/><circle cx="${X(-134)}" cy="${Y(18.6)}" r="4" fill="#5e2513" opacity=".6"/>
+  <ellipse cx="360" cy="0" rx="420" ry="26" fill="#f6ece4" opacity=".85" filter="url(#bl)"/>
+  <ellipse cx="300" cy="360" rx="300" ry="18" fill="#f6ece4" opacity=".7" filter="url(#bl)"/>
+  <g stroke="#fff" stroke-opacity=".08">${[60,120,180,240,300].map(y=>`<line x1="0" x2="720" y1="${y}" y2="${y}"/>`).join("")}${[120,240,360,480,600].map(x=>`<line y1="0" y2="360" x1="${x}" x2="${x}"/>`).join("")}</g>
+  <g font-family="Chakra Petch" font-size="11" fill="#fbe3d2" opacity=".55" font-style="italic">
+   <text x="${X(-134)}" y="${Y(18.6)+28}" text-anchor="middle">Olympus Mons</text>
+   <text x="${X(-78)}" y="${Y(-6)+22}" text-anchor="middle">Valles Marineris</text>
+   <text x="${X(70)}" y="${Y(-42)+4}" text-anchor="middle">Hellas</text></g>
+  ${R.map(r=>{const x=X(r.lon),y=Y(r.lat),s=r.side;return `<g class="pin${cur&&cur.id===r.id?" sel":""}" id="p-${r.id}" data-id="${r.id}" tabindex="0" role="button" aria-label="${L("Sintonizar","Tune in to")} ${r.name}, ${T(r).place}">
+   <circle class="ring" cx="${x}" cy="${y}" r="9" fill="none" stroke="#ffb489" stroke-width="2"/>
+   <circle class="core" cx="${x}" cy="${y}" r="6" fill="#ffb489" stroke="#120806" stroke-width="2"/>
+   <circle cx="${x}" cy="${y}" r="20" fill="transparent"/>
+   <text x="${x+s*12}" y="${y+4}" text-anchor="${s>0?"start":"end"}">${r.name}</text></g>`}).join("")}`;
+  m.querySelectorAll(".pin").forEach(p=>{p.addEventListener("click",()=>tune(p.dataset.id));p.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tune(p.dataset.id)}})});
+}
+function drawTL(){
+  const a=1975,b=2025,p=d=>((new Date(d).getFullYear()+new Date(d).getMonth()/12)-a)/(b-a)*100;
+  $("#tl").innerHTML=R.map(r=>`<div class="r${cur&&cur.id===r.id?" sel":""}" data-id="${r.id}" tabindex="0" role="button" aria-label="${r.name}: ${r.start.slice(0,4)}–${r.end.slice(0,4)}"><span>${r.name}</span><div class="t"><i style="left:${p(r.start)}%;width:${Math.max(.8,p(r.end)-p(r.start))}%"></i></div></div>`).join("");
+  $("#tl").querySelectorAll(".r").forEach(e=>{e.addEventListener("click",()=>tune(e.dataset.id));e.addEventListener("keydown",k=>{if(k.key==="Enter"){tune(e.dataset.id)}})});
+}
+function syncHeard(){
+  $("#cnt").textContent=heard.size;
+  $("#dots").innerHTML=R.map(r=>`<i class="${heard.has(r.id)?"on":""}" title="${r.name}"></i>`).join("");
+  R.forEach(r=>{const h=heard.has(r.id);$("#p-"+r.id).classList.toggle("heard",h);$(`#tl .r[data-id=${r.id}]`).classList.toggle("heard",h)});
+  try{localStorage.setItem("sdm-heard",JSON.stringify([...heard]))}catch(e){}
+  const ok=heard.size===8;$("#cred").classList.toggle("locked",!ok);
+  $("#cst").innerHTML=R.filter(r=>heard.has(r.id)).map(r=>`<span>${r.name}</span>`).join("");
+  if($("#cs").dataset.signed!=="1"){$("#cn").textContent=L("Guardián de Marte","Mars Guardian");$("#cs").textContent=ok?L("Recuperaste las 8 señales. Escribí tu nombre y firmala.","You recovered all 8 signals. Type your name and sign it."):L("Recuperá las 8 señales para activarla.","Recover all 8 signals to activate it.")}
+}
+
+/* ---------- receptor ---------- */
+function noiseFx(ms){
+  const c=$("#noise");if(RM)return Promise.resolve();
+  c.style.display="block";const w=c.width=160,h=c.height=200,x=c.getContext("2d"),img=x.createImageData(w,h);let t0=performance.now();
+  return new Promise(res=>{(function f(t){for(let i=0;i<img.data.length;i+=4){const v=Math.random()*255;img.data[i]=v;img.data[i+1]=v*.8;img.data[i+2]=v*.7;img.data[i+3]=255*(1-(t-t0)/ms*.6)}x.putImageData(img,0,0);if(t-t0<ms)requestAnimationFrame(f);else{c.style.display="none";res()}})(t0)});
+}
+function speakStop(){try{speechSynthesis.cancel()}catch(e){}}
+async function tune(id){
+  const r=R.find(z=>z.id===id);if(!r)return;cur=r;tab="a";
+  if(cleanup){cleanup();cleanup=null}speakStop();
+  document.querySelectorAll(".pin,.tl .r").forEach(e=>e.classList.toggle("sel",e.dataset.id===id));
+  $("#clock").textContent=L("SINTONIZANDO ","TUNING IN ")+r.name.toUpperCase();
+  if(innerWidth<900)$("#rx").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});
+  await noiseFx(650);
+  render(r);
+  if(!heard.has(id)){heard.add(id);syncHeard()}
+}
+function render(r){
+  if(cleanup){cleanup();cleanup=null}
+  const t=T(r),mx=Math.max(r.plan,days(r));
+  $("#clock").textContent=L("SEÑAL: ","SIGNAL: ")+r.name.toUpperCase();
+  $("#rxbody").innerHTML=`
+   <div class="freq con"><span>${L("FRECUENCIA","FREQUENCY")} ${(r.lat+90).toFixed(2)} · ${t.place.toUpperCase()}</span><span>${r.start.slice(0,4)}–${r.end.slice(0,4)}</span></div>
+   <div class="who"><div><h3>${r.name}</h3><p>${t.kind} · ${t.place}</p></div></div>
+   <div class="life"><div class="row"><span>${L("Esperaban","Expected")}: ${t.planL}</span><div class="trk"><div class="fill" data-w="${r.plan/mx*100}"></div></div></div>
+   <div class="row real"><span>${r.real&&r.game==="vuelo"?L("Hizo","Made"):L("Vivió","Lasted")}: ${lifeL(r)}</span><div class="trk"><div class="fill" data-w="${days(r)/mx*100}"></div></div></div></div>
+   <div class="tabs" role="tablist">${TABS.map(z=>`<button role="tab" aria-selected="${z[0]===tab}" data-k="${z[0]}">${L(z[1],z[2])}</button>`).join("")}</div>
+   <p class="msg" id="msg"></p>
+   <div class="tools"><button class="ghost" id="say">${L("Escuchar en voz alta","Read it aloud")}</button></div>
+   <div class="play"><h3>${t.gT}</h3><p class="hint">${t.gH}</p><div id="game"></div></div>
+   <div class="facts"><div><b>${L("Lugar","Location")}</b>${t.place} (${Math.abs(r.lat)}°${r.lat>=0?"N":"S"}, ${Math.abs(r.lon)}°${r.lon>=0?"E":L("O","W")})</div><div><b>${L("Empezó","Started")}</b>${fdate(r.start)}</div><div><b>${L("Último contacto","Last contact")}</b>${fdate(r.end)}</div><div><b>${L("Energía","Power")}</b>${t.energy}</div></div>`;
+  requestAnimationFrame(()=>document.querySelectorAll(".life .fill").forEach(f=>f.style.width=Math.max(1.5,f.dataset.w)+"%"));
+  const tabs=[...document.querySelectorAll(".tabs button")];
+  tabs.forEach(b=>b.addEventListener("click",()=>{tabs.forEach(z=>z.setAttribute("aria-selected",z===b));tab=b.dataset.k;show(tab)}));
+  $("#say").addEventListener("click",()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance($("#msg").dataset.full);u.lang=L("es-AR","en-US");u.rate=.98;speechSynthesis.speak(u)}catch(e){$("#say").textContent=L("Tu navegador no lee en voz alta","Your browser can't read aloud")}});
+  show(tab);
+  cleanup=GAMES[r.game]($("#game"))||null;
+}
+function show(k){
+  const el=$("#msg"),t=T(cur).ch[k];clearInterval(typer);speakStop();el.dataset.full=t;el.classList.remove("done");
+  if(RM){el.textContent=t;el.classList.add("done");return}
+  let i=0;el.textContent="";typer=setInterval(()=>{i+=2;el.textContent=t.slice(0,i);if(i>=t.length){clearInterval(typer);el.classList.add("done")}},16);
+}
+
+/* ---------- mini juegos ---------- */
+function rng(s){return()=>(s=(s*16807)%2147483647)/2147483647}
+const GAMES={
+foto(el){
+  el.innerHTML=`<div class="stage"><canvas width="640" height="240"></canvas></div><div class="ctrl"><button>${L("Recibir la foto","Receive the photo")}</button></div><p class="out"></p>`;
+  const c=el.querySelector("canvas"),x=c.getContext("2d"),o=document.createElement("canvas");o.width=640;o.height=240;const ox=o.getContext("2d"),r=rng(11);
+  let g=ox.createLinearGradient(0,0,0,240);g.addColorStop(0,"#9a9a9a");g.addColorStop(.35,"#bdbdbd");g.addColorStop(.36,"#7a7a7a");g.addColorStop(1,"#4a4a4a");ox.fillStyle=g;ox.fillRect(0,0,640,240);
+  for(let i=0;i<260;i++){const px=r()*640,py=90+r()*150,s=(py-80)/150*14*r()+2;ox.fillStyle=`rgb(${40+r()*70|0},${40+r()*70|0},${40+r()*70|0})`;ox.beginPath();ox.ellipse(px,py,s*1.4,s,0,0,7);ox.fill()}
+  ox.fillStyle="#d8d8d8";ox.beginPath();ox.ellipse(560,232,70,22,0,0,7);ox.fill();ox.fillStyle="#9c9c9c";ox.fillRect(540,170,26,60);
+  x.fillStyle="#120806";x.fillRect(0,0,640,240);
+  let raf,on=false;const btn=el.querySelector("button"),out=el.querySelector(".out");
+  btn.onclick=()=>{if(on)return;on=true;btn.disabled=true;x.fillStyle="#120806";x.fillRect(0,0,640,240);let col=0;out.textContent=L("Recibiendo franja por franja…","Receiving strip by strip…");
+   (function f(){const n=RM?640:6;x.drawImage(o,col,0,n,240,col,0,n,240);col+=n;if(col<640)raf=requestAnimationFrame(f);else{out.textContent=L("Recreación de la primera foto desde el suelo de Marte (20 de julio de 1976): piedras y una de mis patas.","Re-creation of the first photo from the surface of Mars (July 20, 1976): rocks and one of my footpads.");btn.disabled=false;on=false}})()};
+  return()=>cancelAnimationFrame(raf);
+},
+escarcha(el){
+  const r=rng(5);let rocks="";for(let i=0;i<34;i++){const cx=r()*640,cy=110+r()*130,s=6+r()*22;rocks+=`<ellipse cx="${cx}" cy="${cy}" rx="${s*1.3}" ry="${s*.8}" fill="#5b3524"/><ellipse class="fr" cx="${cx}" cy="${cy-s*.35}" rx="${s*1.1}" ry="${s*.35}" fill="#f4f1ee"/>`}
+  el.innerHTML=`<div class="stage"><svg viewBox="0 0 640 240"><rect width="640" height="110" fill="#d9a07a"/><rect y="100" width="640" height="140" fill="#9c5a38"/><g id="frost" style="transition:opacity 1.2s;opacity:0"><rect y="100" width="640" height="140" fill="#f4f1ee" opacity=".35"/></g>${rocks}</svg></div><div class="ctrl"><button>${L("Pasar al invierno","Switch to winter")}</button></div><p class="out"></p>`;
+  const sv=el.querySelector("svg"),fr=sv.querySelectorAll(".fr"),fg=sv.querySelector("#frost"),b=el.querySelector("button"),out=el.querySelector(".out");let w=false;
+  fr.forEach(f=>{f.style.transition="opacity 1.2s";f.style.opacity=0});
+  b.onclick=()=>{w=!w;fg.style.opacity=w?1:0;fr.forEach(f=>f.style.opacity=w?.95:0);b.textContent=w?L("Volver al verano","Back to summer"):L("Pasar al invierno","Switch to winter");out.textContent=w?L("¡Escarcha! Una capa finísima de hielo sobre el suelo de Utopia Planitia.","Frost! A super-thin layer of ice on the ground of Utopia Planitia."):""};
+},
+manejar(el){
+  const W=8,H=5,rocks={"5,1":"Yogi","2,0":"Barnacle Bill"};let p=[1,4];const done=new Set();
+  el.innerHTML=`<div class="stage"><div class="sgrid" tabindex="0" aria-label="${L("Terreno: usá las flechas","Terrain: use the arrow keys")}"></div></div><div class="ctrl"><div class="pad"><span></span><button data-d="0,-1" aria-label="${L("Arriba","Up")}">▲</button><span></span><button data-d="-1,0" aria-label="${L("Izquierda","Left")}">◀</button><button data-d="0,1" aria-label="${L("Abajo","Down")}">▼</button><button data-d="1,0" aria-label="${L("Derecha","Right")}">▶</button></div><span id="steps" class="con">${L("Movimientos","Moves")}: 0</span></div><p class="out"></p>`;
+  const g=el.querySelector(".sgrid"),out=el.querySelector(".out");let n=0;
+  const draw=()=>{let h="";for(let y=0;y<H;y++)for(let x=0;x<W;x++){const k=x+","+y;let c="",t="";if(x===0&&y===4){c="lander";t="Pathfinder"}if(rocks[k]){c="rock"+(done.has(k)?" done":"");t=rocks[k]}if(p[0]===x&&p[1]===y){c="rov";t="S"}h+=`<div class="${c}">${t}</div>`}g.innerHTML=h};
+  const mv=(dx,dy)=>{const nx=p[0]+dx,ny=p[1]+dy,k=nx+","+ny;if(nx<0||ny<0||nx>=W||ny>=H||(nx===0&&ny===4))return;
+   if(rocks[k]){if(!done.has(k)){done.add(k);out.textContent=L(`Apoyé mi espectrómetro en ${rocks[k]}… ¡composición medida! (En la realidad tardaba horas.)`,`I placed my spectrometer on ${rocks[k]}… composition measured! (In real life it took hours.)`)}if(done.size===2)out.textContent=L("¡Analizaste las dos rocas! Estas pistas mostraron que esa llanura se formó con inundaciones.","You analyzed both rocks! These clues showed the plain was shaped by floods.");draw();return}
+   p=[nx,ny];n++;el.querySelector("#steps").textContent=L("Movimientos","Moves")+": "+n;draw()};
+  el.querySelectorAll(".pad button").forEach(b=>b.onclick=()=>{const d=b.dataset.d.split(",").map(Number);mv(d[0],d[1])});
+  g.addEventListener("keydown",e=>{const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(m){e.preventDefault();mv(m[0],m[1])}});draw();
+},
+rueda(el){
+  el.innerHTML=`<div class="stage" style="background:#f2efe6"><canvas width="640" height="240" style="touch-action:none;cursor:grab"></canvas></div><p class="out"></p>`;
+  const c=el.querySelector("canvas"),x=c.getContext("2d"),out=el.querySelector(".out"),r=rng(3);
+  x.fillStyle="#9a5a3a";x.fillRect(0,0,640,240);for(let i=0;i<900;i++){x.fillStyle=`rgba(${60+r()*80|0},${30+r()*40|0},${20},.5)`;x.fillRect(r()*640,r()*240,2+r()*4,2+r()*3)}
+  let down=false,last=null,found=false;
+  const pos=e=>{const b=c.getBoundingClientRect();return[(e.clientX-b.left)/b.width*640,(e.clientY-b.top)/b.height*240]};
+  const dig=e=>{const q=pos(e);x.globalCompositeOperation="destination-out";x.lineWidth=34;x.lineCap="round";x.beginPath();x.moveTo(...(last||q));x.lineTo(...q);x.stroke();x.globalCompositeOperation="source-over";last=q;
+   if(!found){const d=x.getImageData(0,0,640,240).data;let k=0;for(let i=3;i<d.length;i+=160)if(d[i]<10)k++;if(k/(d.length/160)>.07){found=true;out.textContent=L("¡Suelo blanquísimo! Es sílice: se forma con agua caliente, como en las aguas termales. La avería de mi rueda me llevó al descubrimiento.","Bright white soil! It's silica: it forms with hot water, like in hot springs. My broken wheel led me to the discovery.")}}};
+  c.addEventListener("pointerdown",e=>{down=true;last=null;c.setPointerCapture(e.pointerId);dig(e)});
+  c.addEventListener("pointermove",e=>{if(down)dig(e)});
+  c.addEventListener("pointerup",()=>{down=false;last=null});
+},
+odometro(el){
+  el.innerHTML=`<div class="stage"><div class="odo"><span id="km">0${L(",",".")}00</span> <small>km · ${L("año","year")} <span id="yr">2004</span></small></div>
+   <div class="race"><span>Opportunity</span><div class="trk"><div class="fill" id="of"></div><div class="mk" style="left:${42.195/50*100}%"></div></div><span>${L("Marca verde: una maratón (42,195 km)","Green mark: a marathon (42.195 km)")}</span></div></div>
+   <div class="ctrl"><button>${L("Arrancar el odómetro","Start the odometer")}</button></div><p class="out"></p>`;
+  const b=el.querySelector("button"),out=el.querySelector(".out");let raf;
+  b.onclick=()=>{b.disabled=true;out.textContent="";const t0=performance.now(),D=RM?1:4500;
+   (function f(t){const k=Math.min(1,(t-t0)/D),e=1-(1-k)**3,v=45.16*e;el.querySelector("#km").textContent=L(v.toFixed(2).replace(".",","),v.toFixed(2));el.querySelector("#yr").textContent=Math.round(2004+14.4*e);el.querySelector("#of").style.width=v/50*100+"%";
+   if(k<1)raf=requestAnimationFrame(f);else{b.disabled=false;out.textContent=L("45,16 km: ¡más que una maratón, a menos de 1 km/h de promedio! Fue el récord fuera de la Tierra hasta que Perseverance lo superó en octubre de 2026.","45.16 km: more than a marathon, averaging under 1 km/h! It was the off-Earth record until Perseverance beat it in October 2026.")}})(t0)};
+  return()=>cancelAnimationFrame(raf);
+},
+hielo(el){
+  const r=rng(9);let ch="";for(let i=0;i<9;i++)ch+=`<polygon points="${[0,1,2,3].map(j=>{const a=j*1.57+r(),s=6+r()*8;return(200+i*30+Math.cos(a)*s)+","+(150+r()*30+Math.sin(a)*s)}).join(" ")}" fill="#fbfbff"/>`;
+  el.innerHTML=`<div class="stage"><svg viewBox="0 0 640 240"><rect width="640" height="90" fill="#e6c3a6"/><rect y="90" width="640" height="150" fill="#a8693f"/><g id="tr" style="transition:opacity .8s;opacity:0"><path d="M180 130 Q340 115 480 132 L470 196 Q330 210 190 192Z" fill="#6b3b22"/><g id="ic">${ch}</g></g><text x="20" y="40" font-family="Chakra Petch" font-size="20" fill="#5b2a14" id="sol">Sol 18</text></svg></div>
+   <div class="ctrl"><button id="dig">${L("Raspar el suelo","Scrape the ground")}</button><button class="ghost" id="wait" disabled>${L("Esperar 4 soles","Wait 4 sols")}</button></div><p class="out"></p>`;
+  const sv=el.querySelector("svg"),out=el.querySelector(".out"),w=el.querySelector("#wait");let iv;
+  el.querySelector("#dig").onclick=e=>{sv.querySelector("#tr").style.opacity=1;sv.querySelector("#sol").textContent="Sol 20";e.target.disabled=true;w.disabled=false;out.textContent=L("Aparecieron trocitos blancos y brillantes. ¿Sal? ¿Hielo?","Bright white bits appeared. Salt? Ice?")};
+  w.onclick=()=>{w.disabled=true;let s=20;const ic=sv.querySelector("#ic");ic.style.transition="opacity 3s";iv=setInterval(()=>{s++;sv.querySelector("#sol").textContent="Sol "+s;if(s===21)ic.style.opacity=0;if(s>=24){clearInterval(iv);out.textContent=L("¡Desaparecieron! Pasaron de sólido a gas sin derretirse. La sal no hace eso: era hielo de agua.","They vanished! They went from solid to gas without melting. Salt doesn't do that: it was water ice.")}},RM?50:700)};
+  return()=>clearInterval(iv);
+},
+sismo(el){
+  el.innerHTML=`<div class="stage"><canvas width="640" height="200"></canvas></div><div class="ctrl"><button>${L("Simular un marsquake","Simulate a marsquake")}</button><a href="https://soundcloud.com/nasa/quake-sol-173">${L("Escuchá el sonido real (NASA)","Hear the real sound (NASA)")}</a></div><p class="out"></p>`;
+  const c=el.querySelector("canvas"),x=c.getContext("2d"),out=el.querySelector(".out"),pts=new Array(320).fill(0);let amp=0,t=0,raf=0,ac;
+  const f=()=>{t++;amp*=.992;const v=(Math.random()-.5)*(4+amp*90)*(.6+.4*Math.sin(t*.3));pts.push(v);pts.shift();
+   x.fillStyle="#120806";x.fillRect(0,0,640,200);x.strokeStyle="#3a1e12";for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,i*50);x.lineTo(640,i*50);x.stroke()}
+   x.strokeStyle="#56d6bf";x.lineWidth=2;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(i*2,100+p):x.moveTo(0,100+p));x.stroke();if(!RM||amp>.01)raf=requestAnimationFrame(f);else raf=0};f();
+  el.querySelector("button").onclick=()=>{amp=1;out.textContent=L("¡Retumbo! Las ondas del sismo cambian al atravesar corteza, manto y núcleo: así InSight 'vio' el interior de Marte.","Rumble! Quake waves change as they pass through crust, mantle and core: that's how InSight 'saw' inside Mars.");if(!raf)f();
+   try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),now=ac.currentTime;o.type="sine";o.frequency.setValueAtTime(55,now);o.frequency.exponentialRampToValueAtTime(28,now+4);g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.5,now+.3);g.gain.exponentialRampToValueAtTime(.001,now+5);o.connect(g).connect(ac.destination);o.start();o.stop(now+5)}catch(e){}};
+  return()=>{cancelAnimationFrame(raf);try{ac&&ac.close()}catch(e){}};
+},
+vuelo(el){
+  el.innerHTML=`<div class="stage"><svg viewBox="0 0 640 240"><rect width="640" height="240" fill="#d9a07a"/><path d="M0 190 Q160 170 320 188 T640 182 V240 H0Z" fill="#9c5a38"/>
+   <g id="heli" style="transition:transform 1.1s ease-in-out"><g transform="translate(320 170)"><line x1="0" y1="-30" x2="0" y2="0" stroke="#2a140c" stroke-width="3"/><rect x="-60" y="-34" width="120" height="4" rx="2" fill="#2a140c"/><rect x="-50" y="-26" width="100" height="3" rx="2" fill="#2a140c" opacity=".7"/><rect x="-14" y="-12" width="28" height="18" rx="4" fill="#e6e1da" stroke="#2a140c" stroke-width="2"/><path d="M-12 6 L-22 18 M12 6 L22 18" stroke="#2a140c" stroke-width="2"/></g></g>
+   <text x="20" y="34" font-family="Chakra Petch" font-size="20" fill="#2a140c" id="fc"></text></svg></div>
+   <div class="ctrl"><button id="go">${L("Despegar","Take off")}</button><button class="ghost" id="ff">${L("Adelantar 10 vuelos","Skip ahead 10 flights")}</button></div><p class="out"></p>`;
+  const h=el.querySelector("#heli"),out=el.querySelector(".out"),go=el.querySelector("#go"),ff=el.querySelector("#ff");let n=0,busy=false,tm;
+  const upd=()=>{el.querySelector("#fc").textContent=L(`Vuelos: ${n} / plan: 5`,`Flights: ${n} / plan: 5`);
+   if(n===1)out.textContent=L("¡Primer vuelo motorizado en otro planeta! 19 de abril de 2021.","First powered flight on another planet! April 19, 2021.");
+   else if(n===5)out.textContent=L("Plan cumplido: 5 vuelos. Pero la NASA decidió seguir…","Plan complete: 5 flights. But NASA decided to keep going…");
+   else if(n>5&&n<72)out.textContent=L("Ahora soy exploradora aérea: busco caminos para Perseverance.","Now I'm an aerial scout: I look for paths for Perseverance.");
+   if(n>=72){out.textContent=L("Vuelo 72 (18 de enero de 2024): mis hélices se dañaron. Misión cumplida: 128,8 minutos en el aire.","Flight 72 (January 18, 2024): my rotor blades were damaged. Mission accomplished: 128.8 minutes in the air.");go.disabled=ff.disabled=true}};
+  go.onclick=()=>{if(busy||n>=72)return;busy=true;h.style.transform="translateY(-110px)";tm=setTimeout(()=>{h.style.transform="translateY(0)";n++;upd();tm=setTimeout(()=>busy=false,RM?0:1100)},RM?0:1100)};
+  ff.onclick=()=>{n=Math.min(72,n+10);upd()};upd();
+  return()=>clearTimeout(tm);
+}};
+
+/* ---------- credencial ---------- */
+function signCred(){const v=$("#nm").value.trim();$("#cn").textContent=(v||L("Explorador/a","Explorer"))+L(", Guardián de Marte",", Mars Guardian");$("#cs").textContent=L("Escuchó las 8 señales dormidas · ","Heard all 8 sleeping signals · ")+new Date().toLocaleDateString(LC());$("#cs").dataset.signed="1"}
+$("#cf").addEventListener("submit",e=>{e.preventDefault();if(heard.size<8){$("#cs").textContent=L(`Te faltan ${8-heard.size} señales para activarla.`,`You still need ${8-heard.size} more signals to activate it.`);return}signCred()});
+document.querySelectorAll(".lang").forEach(b=>b.addEventListener("click",()=>{toggleLang();if(b.id==="ilang")typeIntro()}));
+
+/* ---------- intro ---------- */
+let iv2;
+function typeIntro(){
+  const t=L("Desde 1976 enviamos robots a Marte. Muchos dejaron de hablar… pero sus historias siguen ahí. ¿Querés escucharlas?","Since 1976 we have sent robots to Mars. Many have gone silent… but their stories are still out there. Do you want to hear them?"),p=$("#itext");
+  clearInterval(iv2);if(RM){p.textContent=t;return}let i=0;iv2=setInterval(()=>{p.textContent=t.slice(0,++i);if(i>=t.length)clearInterval(iv2)},38);
+}
+function intro(){
+  const c=$("#icv"),x=c.getContext("2d");c.width=200;c.height=120;const img=x.createImageData(200,120);let on=true;
+  (function f(){if(!on)return;for(let i=0;i<img.data.length;i+=4){const v=Math.random()*255;img.data[i]=v;img.data[i+1]=v*.7;img.data[i+2]=v*.6;img.data[i+3]=255}x.putImageData(img,0,0);if(!RM)setTimeout(()=>requestAnimationFrame(f),60)})();
+  typeIntro();
+  $("#ion").onclick=()=>{on=false;clearInterval(iv2);$("#intro").remove();$("#map .pin").focus()};
+}
+applyLang();intro();
+}
+</script>
+</body>
+</html>
