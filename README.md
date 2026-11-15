@@ -29,13 +29,13 @@ An interactive web experience where visitors tune in to the "silent signals" of 
 
 ## How to run
 
-No build step or dependencies to install. Open `señales-de-marte.html` in a modern web browser **with an internet connection**.
+No build step or dependencies to install. Open `Signals_from_Mars.html` in a modern web browser **with an internet connection**.
 
 If the 3D globe or models do not load when opening the file locally, serve it through any static web server:
 
 ```bash
 python3 -m http.server 8000
-# Then open http://localhost:8000/señales-de-marte.html
+# Then open http://localhost:8000/Signals_from_Mars.html
 ```
 
 To jump directly to a robot, use its URL hash: `#viking1`, `#viking2`, `#sojourner`, `#spirit`, `#opportunity`, `#phoenix`, `#insight`, or `#ingenuity`.
