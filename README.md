@@ -1,4 +1,4 @@
-# Signals from Mars (Señales de Marte)
+# Signals from Mars
 
 An interactive web experience where visitors tune in to the "silent signals" of eight NASA robots on Mars and hear their stories told in the first person. A prototype for the **NASA Space Apps Challenge 2026**. This is not an official NASA product.
 
