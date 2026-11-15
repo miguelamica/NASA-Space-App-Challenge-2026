@@ -105,3 +105,7 @@ Mission data comes from [NSSDCA](https://nssdc.gsfc.nasa.gov/) and [NASA Science
 - An internet connection is required for 3D assets, fonts, and SoundCloud.
 - Narration uses voices available in the browser, so voices vary by operating system.
 - InSight's real audio recording depends on the SoundCloud player and the browser's autoplay restrictions.
+
+## AI Assistance
+
+Claude was used to assist with code development, debugging, and content writing. The team reviewed and integrated the AI-assisted contributions.
