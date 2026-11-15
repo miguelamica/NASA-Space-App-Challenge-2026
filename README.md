@@ -27,16 +27,44 @@ An interactive web experience where visitors tune in to the "silent signals" of 
 - **"Is It True?" section:** Sources, debunked myths, and facts for which sources disagree.
 - **Bilingual interface** (Spanish / English), light and dark themes, and support for `prefers-reduced-motion`.
 
+
 ## How to run
 
-No build step or dependencies to install. Open `Signals_from_Mars.html` in a modern web browser **with an internet connection**.
+No build step or additional dependencies are required. An internet connection is needed to load external 3D models, libraries, and audio resources.
 
-If the 3D globe or models do not load when opening the file locally, serve it through any static web server:
+### Windows
+
+1. Download the repository as a ZIP file from GitHub.
+2. Extract the ZIP file.
+3. Open the extracted folder containing `Signals_from_Mars.html`.
+4. Type `cmd` in the File Explorer address bar and press Enter.
+5. Run the following command:
+
+```powershell
+py -m http.server 8001
+```
+
+6. Open your browser and visit:
+
+http://localhost:8001/Signals_from_Mars.html
+
+Keep the terminal open while using the application. Press `Ctrl + C` to stop the server.
+
+### macOS / Linux
+
+Open a terminal in the project directory and run:
 
 ```bash
 python3 -m http.server 8000
-# Then open http://localhost:8000/Signals_from_Mars.html
 ```
+
+Then visit:
+
+http://localhost:8000/Signals_from_Mars.html
+
+### Direct access
+
+The HTML file can also be opened directly in a modern browser. However, some 3D models and external resources may require running the application through a local HTTP server.
 
 To jump directly to a robot, use its URL hash: `#viking1`, `#viking2`, `#sojourner`, `#spirit`, `#opportunity`, `#phoenix`, `#insight`, or `#ingenuity`.
 
